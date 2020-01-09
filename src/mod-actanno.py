@@ -252,6 +252,7 @@ class AAController:
 		# The nr. of the currently visible frame
 		self.cur_frame_nr = 0
 		self.cur_image = None
+		self.aid_img = None
 		self.switch_activated = False
 
 		if len(sys.argv) < 1:
@@ -305,6 +306,7 @@ class AAController:
 			self.depth_available = False
 
 		self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
+		self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
 		# If the given XML file exists, parse it
 
 		if not os.path.isdir(os.path.dirname(self.output_filename)):
@@ -390,6 +392,15 @@ class AAController:
 			self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
 		# print "frame nr. ",self.curFrameNr, "=",self.filenames[self.curFrameNr]
 		return self.cur_image
+
+	def set_aid(self):
+		path = self.aid_filename
+		img_matplotlib = mpimg.imread(path)
+		value_max = np.amax(img_matplotlib)
+		scale = 254. / value_max
+		png = Image.fromarray(np.uint8(img_matplotlib * scale))
+		self.aid_img = png.convert('RGB')
+		return self.aid_img
 
 	# Remove all rectangles of the current frame
 	def delete_all_rects(self):
@@ -754,17 +765,21 @@ class Example(Frame):
 		self.img = self.ct.cur_frame()
 		self.cur_frame = ImageTk.PhotoImage(self.img)
 
+		self.aid_img = self.ct.set_aid()
+		self.aid_frame = ImageTk.PhotoImage(self.aid_img)
+
 		self.img_trash = ImageTk.PhotoImage(Image.open(self.cur_path + "/trashcan.png"))
 		self.img_move = ImageTk.PhotoImage(Image.open(self.cur_path + "/move.png"))
 		# create canvas
 		self.canvas = Canvas(self.parent, width=self.img.size[0], height=self.img.size[1])
-
+		self.aid_canvas = Canvas(self.parent, width=self.aid_img.size[0], height=self.aid_img.size[1])
 		# create scale bar
 		self.scalevar = IntVar()
 		self.xscale = Scale(self.parent, variable=self.scalevar, from_=1, to=len(self.ct.filenames),
 							orient=HORIZONTAL, command=self.change_frame)
 
 		self.canvas.create_image(0, 0, anchor=NW, image=self.cur_frame)
+		self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
 
 		self.object_id_box = Listbox(self.parent)
 		self.switch_button = Button(self.parent, text="RGB <-> Depth")
@@ -783,6 +798,7 @@ class Example(Frame):
 		self.export_2voc.grid(row=4, column=1)
 		self.quit_button.grid(row=5, column=1)
 		self.xscale.grid(row=6, sticky=W + E)
+		self.aid_canvas.grid(row=0, column=2, rowspan=6)
 
 		# bindings
 		self.canvas.bind("<Key-Left>", self.prev_frame)
@@ -801,16 +817,6 @@ class Example(Frame):
 		self.canvas.bind("p", self.next_frame_w_prop_forced_selected_rect)
 		self.canvas.bind("d", self.delete_cur_rect)
 		self.canvas.bind("D", self.delete_all_rects)
-		self.canvas.bind("1", self.chose_object_id_1)
-		self.canvas.bind("2", self.chose_object_id_2)
-		self.canvas.bind("3", self.chose_object_id_3)
-		self.canvas.bind("4", self.chose_object_id_4)
-		self.canvas.bind("5", self.chose_object_id_5)
-		self.canvas.bind("6", self.chose_object_id_6)
-		self.canvas.bind("7", self.chose_object_id_7)
-		self.canvas.bind("8", self.chose_object_id_8)
-		self.canvas.bind("9", self.chose_object_id_9)
-		self.canvas.bind("0", self.chose_object_id_10)
 		self.object_id_box.bind("<Key-space>", self.next_frame_w_rop)  # the space key
 		self.canvas.bind("<Key-space>", self.next_frame_w_rop)  # the space key
 		self.object_id_box.bind("<<ListboxSelect>>", self.object_id_box_click)
@@ -919,7 +925,7 @@ class Example(Frame):
 			self.canvas.create_rectangle(self.curx1, self.cury1, self.curx2, self.cury2, outline="blue", width=2)
 		elif self.state == "i":
 			# We currently choose a running id
-			self.propobject_id = self.cur_ObjectId + (event.y - self.oldY) / 20
+			self.propobject_id = self.cur_object_id + (event.y - self.oldY) / 20
 			if self.propobject_id < 0:
 				self.propobject_id = 0
 			if self.propobject_id > MAX_object_id:
@@ -1026,12 +1032,12 @@ class Example(Frame):
 			self.cury2 = r.y2
 			self.cur_width = abs(r.x2 - r.x1)
 			self.cur_heigth = abs(r.y2 - r.y1)
-			self.cur_ObjectId = r.object_id
+			self.cur_object_id = r.object_id
 			self.ct.del_rect(sempos.index)
 		# We start drawing a new rectangle
 		else:
 			self.state = "d"
-			self.cur_ObjectId = self.object_id_proposed_for_new_rect
+			self.cur_object_id = self.object_id_proposed_for_new_rect
 			self.curx1 = event.x
 			self.cury1 = event.y
 			self.curx2 = -1
@@ -1056,11 +1062,11 @@ class Example(Frame):
 				# If we create a new rectangle, we check whether we moved
 				# since the first click (Non trivial rectangle)?
 				if (self.state != "d") or (abs(event.x - self.curx1) > 5) or (abs(event.y - self.cury1) > 5):
-					self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_ObjectId)
+					self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_object_id)
 					self.is_modified = True
 					# We just drew a new rectangle
 					if self.state == "d":
-						self.ct.use_object_id(self.cur_ObjectId)
+						self.ct.use_object_id(self.cur_object_id)
 						self.display_class_assignations()
 						self.object_id_proposed_for_new_rect = self.object_id_proposed_for_new_rect + 1
 			self.curx2 = event.x
@@ -1077,7 +1083,7 @@ class Example(Frame):
 		if sempos.index >= 0:
 			self.state = "i"
 			r = self.ct.get_rects()[sempos.index]
-			self.cur_ObjectId = r.object_id
+			self.cur_object_id = r.object_id
 			self.curx1 = r.x1
 			self.cury1 = r.y1
 
@@ -1088,14 +1094,14 @@ class Example(Frame):
 			self.is_modified = True
 		self.state = ""
 
-	def chose_object_id(self, event, idx):
-		sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
-		print "choseobject_id(self,event,id):", sempos.index, "pos: ", self.mousex, ",", self.mousey
-		if sempos.index > - 1:
-			self.ct.update_object_id(sempos.index, idx)
-			self.display_anno()
-			self.display_class_assignations()
-			self.is_modified = True
+	# def chose_object_id(self, event, idx):
+	# 	sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
+	# 	print "choseobject_id(self,event,id):", sempos.index, "pos: ", self.mousex, ",", self.mousey
+	# 	if sempos.index > - 1:
+	# 		self.ct.update_object_id(sempos.index, idx)
+	# 		self.display_anno()
+	# 		self.display_class_assignations()
+	# 		self.is_modified = True
 
 	# draw an anchor point at (x, y) coordinates
 	@staticmethod
@@ -1188,35 +1194,35 @@ class Example(Frame):
 		self.canvas.focus_force()
 		self.is_modified = True
 
-	def chose_object_id_1(self, event):
-		self.chose_object_id(event, 1)
-
-	def chose_object_id_2(self, event):
-		self.chose_object_id(event, 2)
-
-	def chose_object_id_3(self, event):
-		self.chose_object_id(event, 3)
-
-	def chose_object_id_4(self, event):
-		self.chose_object_id(event, 4)
-
-	def chose_object_id_5(self, event):
-		self.chose_object_id(event, 5)
-
-	def chose_object_id_6(self, event):
-		self.chose_object_id(event, 6)
-
-	def chose_object_id_7(self, event):
-		self.chose_object_id(event, 7)
-
-	def chose_object_id_8(self, event):
-		self.chose_object_id(event, 8)
-
-	def chose_object_id_9(self, event):
-		self.chose_object_id(event, 9)
-
-	def chose_object_id_10(self, event):
-		self.chose_object_id(event, 10)
+	# def chose_object_id_1(self, event):
+	# 	self.chose_object_id(event, 1)
+	#
+	# def chose_object_id_2(self, event):
+	# 	self.chose_object_id(event, 2)
+	#
+	# def chose_object_id_3(self, event):
+	# 	self.chose_object_id(event, 3)
+	#
+	# def chose_object_id_4(self, event):
+	# 	self.chose_object_id(event, 4)
+	#
+	# def chose_object_id_5(self, event):
+	# 	self.chose_object_id(event, 5)
+	#
+	# def chose_object_id_6(self, event):
+	# 	self.chose_object_id(event, 6)
+	#
+	# def chose_object_id_7(self, event):
+	# 	self.chose_object_id(event, 7)
+	#
+	# def chose_object_id_8(self, event):
+	# 	self.chose_object_id(event, 8)
+	#
+	# def chose_object_id_9(self, event):
+	# 	self.chose_object_id(event, 9)
+	#
+	# def chose_object_id_10(self, event):
+	# 	self.chose_object_id(event, 10)
 
 	def debug_event(self, title):
 		self.event_counter += 1

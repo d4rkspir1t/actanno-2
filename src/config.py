@@ -33,6 +33,7 @@ __C.VOC_DIR = "default"
 __C.FOLDER_NAME = "default"
 __C.DATASET_NAME = "default"
 __C.OWNER = "default"
+__C.AID_IMG = "default"
 
 
 def _merge_a_into_b(a, b):

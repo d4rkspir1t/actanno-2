@@ -4,4 +4,5 @@ VOC_DIR: 'voc/'
 XML_PREFIX: 'aaa.xml'
 RGB_PREFIX: '/head-center/frame'
 D_PREFIX: 'default'
-CLASSES: ["N/A", "principal_speaker", "listener"]
+AID_IMG: 'f-formations.png'
+CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "rectangular"]
