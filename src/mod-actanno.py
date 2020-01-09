@@ -37,7 +37,7 @@ def mkdir_p(path):
 # Global constants
 # ***************************************************************************
 
-MAX_objectId = 100
+MAX_object_id = 999
 CORNER_DIST_THR = 8
 CENTER_DIST_THR = 10
 CORNER_SIZE = 30
@@ -138,18 +138,14 @@ class AARect:
 
 # ***************************************************************************
 # C type matching Python type
-class c_aa_rect(ctypes.Structure):
-	fields_ = [("x1", ctypes.c_int),
-			   ("y1", ctypes.c_int),
-			   ("x2", ctypes.c_int),
-			   ("y2", ctypes.c_int),
-			   ("objectId", ctypes.c_int)]
+class c_AARect(ctypes.Structure):
+	_fields_ = [("x1", ctypes.c_int), ("y1", ctypes.c_int), ("x2", ctypes.c_int), ("y2", ctypes.c_int), ("objectId", ctypes.c_int)]
 
 
 # ***************************************************************************
 # convert AARect to c_AARect
 def to_c_aa_rect(r):
-	return c_aa_rect(x1=int(r.x1), y1=int(r.y1), x2=int(r.x2), y2=int(r.y2), objectId=int(r.objectId))
+	return c_AARect(x1=int(r.x1), y1=int(r.y1), x2=int(r.x2), y2=int(r.y2), objectId=int(r.object_id))
 
 
 # ***************************************************************************
@@ -251,7 +247,7 @@ class AAController:
 		self.old_frame = None
 		# An array holding an AAFrame object for each frame of the video
 		self.frames = []
-		# An array holding the classnr for each object nr. ("objectId")
+		# An array holding the classnr for each object nr. ("object_id")
 		self.class_assignations = []
 		# The nr. of the currently visible frame
 		self.cur_frame_nr = 0
@@ -275,7 +271,7 @@ class AAController:
 		prefix = cfg.MAIN_DIR + cfg.RGB_PREFIX
 		self.filenames = sorted(glob.glob(prefix + "*"))
 		if len(self.filenames) < 1:
-			print >> sys.stderr, "Did not find any rgb frames! Is the prefix correct?"
+			print >> sys.stderr, "Did not find any rgb frames! Is the prefix correct? Prefix: ", prefix
 			self.usage()
 		for i in range(len(self.filenames)):
 			self.frames.append(AAFrame())
@@ -320,10 +316,10 @@ class AAController:
 		else:
 			# If it does NOT exist, let's try to create one
 			if not os.path.exists(self.output_filename):
-				s = "Could not save to the specified XML file. Please check the location. Does the directory exist?"
-				tkMessageBox.showinfo(TITLE, s)
-				sys.exit(1)
-			tkMessageBox.showinfo(TITLE, "XML File " + self.output_filename + " does not exist. Creating a new one.")
+				# s = "Could not save to the specified XML file. Please check the location. Does the directory exist? Dir: " + self.output_filename
+				# tkMessageBox.showinfo(TITLE, s)
+				# sys.exit(1)
+				tkMessageBox.showinfo(TITLE, "XML File " + self.output_filename + " does not exist. Creating a new one.")
 
 	@staticmethod
 	def usage():
@@ -334,7 +330,7 @@ class AAController:
 	# Check the current annotation for validity
 	def check_validity(self):
 		msg = ''
-		# Check for several occurrences of a objectId in the same frame.
+		# Check for several occurrences of a object_id in the same frame.
 		for (frnr, fr) in enumerate(self.frames):
 			msg = msg + self.check_validity_frame(frnr)
 
@@ -353,11 +349,11 @@ class AAController:
 		msg = ''
 		ids = set()
 		for r in self.frames[framenr].rects:
-			if r.objectId in ids:
-				msg = msg + 'Activity nr. ' + str(r.objectId) + ' occurs multiple times in frame nr. ' + str(
+			if r.object_id in ids:
+				msg = msg + 'Activity nr. ' + str(r.object_id) + ' occurs multiple times in frame nr. ' + str(
 					framenr + 1) + '.\n'
 			else:
-				ids.add(r.objectId)
+				ids.add(r.object_id)
 		return msg
 
 	# Open the image corresponding to the current frame number,
@@ -441,11 +437,10 @@ class AAController:
 
 							# convert Python types to C types
 							c_inrect = to_c_aa_rect(inrect)
-							c_outrect = c_aa_rect()
+							c_outrect = c_AARect()
 
 							# call C++ tracking lib
-							trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
-															 ctypes.byref(c_inrect), ctypes.byref(c_outrect))
+							trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),ctypes.byref(c_inrect), ctypes.byref(c_outrect))
 
 							# convert C types to Python types
 							outrect = to_aa_rect(c_outrect)
@@ -459,8 +454,8 @@ class AAController:
 		return self.cur_image
 
 	def next_frame_prop_current_rect(self, rect_index):
-		propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].objectId
-		print "Rect[", rect_index, "].objectId == ", propagate_id
+		propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
+		print "Rect[", rect_index, "].object_id == ", propagate_id
 
 		if self.cur_frame_nr < len(self.filenames) - 1:
 			self.cur_frame_nr += 1
@@ -492,7 +487,7 @@ class AAController:
 
 				# convert Python types to C types
 				c_inrect = to_c_aa_rect(rect_to_propagate)
-				c_outrect = c_aa_rect()
+				c_outrect = c_AARect()
 
 				# call C++ tracking lib
 				trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
@@ -507,7 +502,7 @@ class AAController:
 			# update it or add it
 			rect_already_exists = False
 			for i, currentrect in enumerate(self.frames[self.cur_frame_nr].rects):
-				if currentrect.objectId == propagate_id:
+				if currentrect.object_id == propagate_id:
 					print "Rectangle found. Updating."
 					self.frames[self.cur_frame_nr].rects[i] = copy.deepcopy(rect_propagated)
 					rect_already_exists = True
@@ -568,7 +563,7 @@ class AAController:
 		self.frames[self.cur_frame_nr].rects[index_rect].object_id = new_id
 		self.use_object_id(new_id)
 
-	# Tell the system the given objectId is used. If the array holding the classes
+	# Tell the system the given object_id is used. If the array holding the classes
 	# for the different ids is not large enough, grow it and insert -1 as class
 	def use_object_id(self, new_id):
 		neededcap = new_id - len(self.class_assignations)
@@ -584,9 +579,9 @@ class AAController:
 		# Get maximum running id
 		maxid = -1
 		for (i, f) in enumerate(self.frames):
-			for (j, r) in enumerate(f.getRects()):
-				if r.objectId > maxid:
-					maxid = r.objectId
+			for (j, r) in enumerate(f.get_rects()):
+				if r.object_id > maxid:
+					maxid = r.object_id
 		fd = None
 		try:
 			fd = open(filename, 'w')
@@ -603,8 +598,8 @@ class AAController:
 		for cur_object_id in range(maxid):
 			found_rects = False
 			for (i, f) in enumerate(self.frames):
-				for (j, r) in enumerate(f.getRects()):
-					if r.objectId == cur_object_id + 1:
+				for (j, r) in enumerate(f.get_rects()):
+					if r.object_id == cur_object_id + 1:
 						if not found_rects:
 							found_rects = True
 							fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(
@@ -647,9 +642,9 @@ class AAController:
 			print >> fd, "	</size>"
 			print >> fd, "	<segmented>0</segmented>"
 
-			for (j, r) in enumerate(f.getRects()):
+			for (j, r) in enumerate(f.get_rects()):
 				print >> fd, "	<object>"
-				print >> fd, "		<name>" + classnames[self.class_assignations[r.objectId - 1]] + "</name>"
+				print >> fd, "		<name>" + classnames[self.class_assignations[r.object_id - 1]] + "</name>"
 				print >> fd, "		<pose>unknown</pose>"
 				print >> fd, "		<truncated>-1</truncated>"
 				print >> fd, "		<difficult>0</difficult>"
@@ -692,16 +687,16 @@ class AAController:
 		if len(objectnodes) < 1:
 			tkMessageBox.showinfo(TITLE, "The given XML file does not contain any objects.")
 		for a in objectnodes:
-			# Add the classnr to the objectId array. Grow if necessary
+			# Add the classnr to the object_id array. Grow if necessary
 			anr = int(get_att(a, "nr"))
 			aclass = int(get_att(a, "class"))
 			# print "-----",anr,aclass
 			# print len(self.ClassAssignations)
 			if len(self.class_assignations) < anr:
-				# print "Growing objectId:"
+				# print "Growing object_id:"
 				self.class_assignations += [None] * (anr - len(self.class_assignations))
 			self.class_assignations[anr - 1] = aclass
-			# print "size of objectId array:", len(self.ClassAssignations), "array:", self.ClassAssignations
+			# print "size of object_id array:", len(self.ClassAssignations), "array:", self.ClassAssignations
 
 			# Get all the bounding boxes for this object
 			bbs = a.findall("bbox")
@@ -747,7 +742,7 @@ class Example(Frame):
 		self.cur_path = cur_path
 		self.ct = AAController()
 		font_path = os.path.dirname(os.path.realpath(__file__))
-		self.img_font = ImageFont.truetype(os.path.join(font_path + "FreeSans.ttf"), 30)
+		self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 30)
 		self.init_ui()
 		self.event_counter = 0
 
@@ -924,14 +919,14 @@ class Example(Frame):
 			self.canvas.create_rectangle(self.curx1, self.cury1, self.curx2, self.cury2, outline="blue", width=2)
 		elif self.state == "i":
 			# We currently choose a running id
-			self.propobjectId = self.cur_ObjectId + (event.y - self.oldY) / 20
-			if self.propobjectId < 0:
-				self.propobjectId = 0
-			if self.propobjectId > MAX_objectId:
-				self.propobjectId = MAX_objectId
+			self.propobject_id = self.cur_ObjectId + (event.y - self.oldY) / 20
+			if self.propobject_id < 0:
+				self.propobject_id = 0
+			if self.propobject_id > MAX_object_id:
+				self.propobject_id = MAX_object_id
 			self.canvas.create_rectangle(self.curx1, self.cury1, self.curx1 + 30, self.cury1 + 30, outline="white",
 										 fill="white")
-			self.canvas.create_text(self.curx1 + 15, self.cury1 + 15, text=str(self.propobjectId),
+			self.canvas.create_text(self.curx1 + 15, self.cury1 + 15, text=str(self.propobject_id),
 									fill="blue", font=("Helvectica", "20"))
 		elif self.state == "ul":
 			# We currently move the upper left corner
@@ -1031,7 +1026,7 @@ class Example(Frame):
 			self.cury2 = r.y2
 			self.cur_width = abs(r.x2 - r.x1)
 			self.cur_heigth = abs(r.y2 - r.y1)
-			self.cur_ObjectId = r.objectId
+			self.cur_ObjectId = r.object_id
 			self.ct.del_rect(sempos.index)
 		# We start drawing a new rectangle
 		else:
@@ -1082,20 +1077,20 @@ class Example(Frame):
 		if sempos.index >= 0:
 			self.state = "i"
 			r = self.ct.get_rects()[sempos.index]
-			self.cur_ObjectId = r.objectId
+			self.cur_ObjectId = r.object_id
 			self.curx1 = r.x1
 			self.cury1 = r.y1
 
 	def right_mouse_up(self, event):
 		if self.state == "i":
-			self.ct.update_object_id(self.cur_sem_pos.index, self.propobjectId)
+			self.ct.update_object_id(self.cur_sem_pos.index, self.propobject_id)
 			self.display_class_assignations()
 			self.is_modified = True
 		self.state = ""
 
 	def chose_object_id(self, event, idx):
 		sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
-		print "choseobjectId(self,event,id):", sempos.index, "pos: ", self.mousex, ",", self.mousey
+		print "choseobject_id(self,event,id):", sempos.index, "pos: ", self.mousex, ",", self.mousey
 		if sempos.index > - 1:
 			self.ct.update_object_id(sempos.index, idx)
 			self.display_anno()
@@ -1139,7 +1134,7 @@ class Example(Frame):
 				curcol = "red"
 			draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
 			draw.rectangle([r.x1 + 1, r.y1 + 1, r.x2 - 1, r.y2 - 1], outline=curcol)
-			draw.text([r.x1 + 3, r.y1 + 2], str(r.objectId), font=self.img_font, fill=curcol)
+			draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)
 
 			# Draw the icons
 			if i == sempos.index:

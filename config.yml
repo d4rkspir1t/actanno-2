@@ -2,6 +2,6 @@ DATASET_NAME: 'SAIR.ELP'
 OWNER: 'SAIR lab - KCL'
 VOC_DIR: 'voc/'
 XML_PREFIX: 'aaa.xml'
-RGB_PREFIX: 'rgb-'
+RGB_PREFIX: '/head-center/frame'
 D_PREFIX: 'default'
 CLASSES: ["N/A", "principal_speaker", "listener"]
