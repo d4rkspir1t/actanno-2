@@ -7,6 +7,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageTk
+import pyscreenshot as ImageGrab
 import sys
 import glob
 import copy
@@ -409,6 +410,7 @@ class AAController:
 	# Remove the rectangle with the given index from the list
 	# of rectangles of the currently selected frame
 	def delete_rect(self, index):
+		print 'To delete: ', index
 		del self.frames[self.cur_frame_nr].rects[index]
 
 	def next_frame(self, do_propagate, force):
@@ -829,13 +831,21 @@ class Example(Frame):
 		self.state = ""
 		self.mousex = 1
 		self.mousey = 1
-		self.object_id_proposed_for_new_rect = 1
+		self.object_id_proposed_for_new_rect = len(self.ct.class_assignations) + 1
 		self.display_anno()
 		self.display_class_assignations()
 		self.fn_entry.delete(0, END)
 		self.fn_entry.insert(0, self.ct.video_name)
 		self.is_modified = False
 		self.canvas.focus_force()
+
+	def get_canvas_box(self):
+		x = self.canvas.winfo_rootx() + self.canvas.winfo_x()
+		y = self.canvas.winfo_rooty() + self.canvas.winfo_y()
+		x1 = x + self.canvas.winfo_width()
+		y1 = y + self.canvas.winfo_height()
+		box = (x, y, x1, y1)
+		return box
 
 	def check_validity(self):
 		msg = self.ct.check_validity()
@@ -863,7 +873,16 @@ class Example(Frame):
 				trackingLib.close_lib()
 			self.parent.destroy()
 
+	def save_images_with_bbox(self):
+		grabcanvas = ImageGrab.grab(bbox=self.get_canvas_box())
+		# grabcanvas.show()
+		frame_name = 'bbox' + str(self.ct.cur_frame_nr).zfill(6) + '.png'
+		path = os.path.join(cfg.BBOX_PREFIX, frame_name)
+		grabcanvas.save(path)
+
 	def update_after_jump(self):
+		# if cfg.BBOX_PREFIX != 'default':
+		# 	self.save_images_with_bbox()
 		self.cur_frame = ImageTk.PhotoImage(self.img)
 		self.display_anno()
 		self.parent.title(
@@ -871,31 +890,45 @@ class Example(Frame):
 		self.canvas.update()
 
 	def change_frame(self, id_frame):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.change_frame(id_frame)
 		self.update_after_jump()
 
 	def prev_frame(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.prev_frame()
 		self.update_after_jump()
 
 	def prev_frame_far(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.prev_frame_far()
 		self.update_after_jump()
 
 	def next_frame(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.next_frame(False, False)
 		self.update_after_jump()
 
 	def next_frame_far(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.next_frame_far()
 		self.update_after_jump()
 
 	def next_frame_w_rop(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.next_frame(True, False)
 		self.update_after_jump()
 		self.is_modified = True
 
 	def next_frame_w_prop_forced(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.next_frame(True, True)
 		self.update_after_jump()
 		self.is_modified = True
@@ -975,12 +1008,16 @@ class Example(Frame):
 		#	self.canvas.create_image(self.curx2-40, self.cury2-40, anchor=NW, image=self.imgTrash)
 
 	def save_xml(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.ct.videoname = self.fn_entry.get()
 		self.ct.export_xml()
 		self.check_validity()
 		self.is_modified = False
 
 	def save_xml2voc(self, event):
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.ct.videoname = self.fn_entry.get()
 		self.ct.export_xml()
 		self.check_validity()
@@ -990,6 +1027,8 @@ class Example(Frame):
 	def activate_switch(self, event):
 		self.ct.switchActivated = not self.ct.switchActivated
 		# print self.ct.switchActivated
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.img = self.ct.cur_frame()
 		self.update_after_jump()
 
@@ -997,7 +1036,10 @@ class Example(Frame):
 	def delete_all_rects(self, event):
 		self.ct.delete_all_rects()
 		self.display_anno()
+		self.display_class_assignations()
 		self.canvas.update()
+		if cfg.BBOX_PREFIX != 'default':
+			self.save_images_with_bbox()
 		self.is_modified = True
 
 	# Remove the currently selected rectangle of the current frame
@@ -1006,7 +1048,10 @@ class Example(Frame):
 		if sempos.index > -1:
 			self.ct.delete_rect(sempos.index)
 			self.display_anno()
+			self.display_class_assignations()
 			self.canvas.update()
+			if cfg.BBOX_PREFIX != 'default':
+				self.save_images_with_bbox()
 		self.is_modified = True
 
 	def left_mouse_down(self, event):
@@ -1063,6 +1108,8 @@ class Example(Frame):
 				# since the first click (Non trivial rectangle)?
 				if (self.state != "d") or (abs(event.x - self.curx1) > 5) or (abs(event.y - self.cury1) > 5):
 					self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_object_id)
+					if cfg.BBOX_PREFIX != 'default':
+						self.save_images_with_bbox()
 					self.is_modified = True
 					# We just drew a new rectangle
 					if self.state == "d":
@@ -1193,36 +1240,6 @@ class Example(Frame):
 		# Put the focus on the canvas, else the listbox gets all events
 		self.canvas.focus_force()
 		self.is_modified = True
-
-	# def chose_object_id_1(self, event):
-	# 	self.chose_object_id(event, 1)
-	#
-	# def chose_object_id_2(self, event):
-	# 	self.chose_object_id(event, 2)
-	#
-	# def chose_object_id_3(self, event):
-	# 	self.chose_object_id(event, 3)
-	#
-	# def chose_object_id_4(self, event):
-	# 	self.chose_object_id(event, 4)
-	#
-	# def chose_object_id_5(self, event):
-	# 	self.chose_object_id(event, 5)
-	#
-	# def chose_object_id_6(self, event):
-	# 	self.chose_object_id(event, 6)
-	#
-	# def chose_object_id_7(self, event):
-	# 	self.chose_object_id(event, 7)
-	#
-	# def chose_object_id_8(self, event):
-	# 	self.chose_object_id(event, 8)
-	#
-	# def chose_object_id_9(self, event):
-	# 	self.chose_object_id(event, 9)
-	#
-	# def chose_object_id_10(self, event):
-	# 	self.chose_object_id(event, 10)
 
 	def debug_event(self, title):
 		self.event_counter += 1
