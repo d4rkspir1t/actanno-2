@@ -1,9 +1,8 @@
 DATASET_NAME: 'SAIR.ELP'
 OWNER: 'SAIR lab - KCL'
 VOC_DIR: 'voc/'
-XML_PREFIX: 'aaa.xml'
-RGB_PREFIX: '/head-center/frame'
-D_PREFIX: 'default'
-AID_IMG: 'f-formations.png'
-CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "rectangular"]
-BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/kcltestimages/bbox_saves'
+XML_PREFIX: '/HtoG.xml'
+RGB_PREFIX: '/bbox'
+AID_IMG: 'default'
+CLASSES: ["N/A"]
+BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/human-notation/bboxes'

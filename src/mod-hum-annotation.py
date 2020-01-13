@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar
-from Tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL
+from Tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -12,6 +12,7 @@ import sys
 import glob
 import copy
 import tkMessageBox
+import tkSimpleDialog
 import os
 import xml.etree.ElementTree as xml
 
@@ -307,7 +308,8 @@ class AAController:
 			self.depth_available = False
 
 		self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
-		self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
+		if cfg.AID_IMG != 'default':
+			self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
 		# If the given XML file exists, parse it
 
 		if not os.path.isdir(os.path.dirname(self.output_filename)):
@@ -767,24 +769,27 @@ class Example(Frame):
 		self.img = self.ct.cur_frame()
 		self.cur_frame = ImageTk.PhotoImage(self.img)
 
-		self.aid_img = self.ct.set_aid()
-		self.aid_frame = ImageTk.PhotoImage(self.aid_img)
+		if cfg.AID_IMG != 'default':
+			self.aid_img = self.ct.set_aid()
+			self.aid_frame = ImageTk.PhotoImage(self.aid_img)
 
 		self.img_trash = ImageTk.PhotoImage(Image.open(self.cur_path + "/trashcan.png"))
 		self.img_move = ImageTk.PhotoImage(Image.open(self.cur_path + "/move.png"))
 		# create canvas
 		self.canvas = Canvas(self.parent, width=self.img.size[0], height=self.img.size[1])
-		self.aid_canvas = Canvas(self.parent, width=self.aid_img.size[0], height=self.aid_img.size[1])
+		if cfg.AID_IMG != 'default':
+			self.aid_canvas = Canvas(self.parent, width=self.aid_img.size[0], height=self.aid_img.size[1])
 		# create scale bar
 		self.scalevar = IntVar()
 		self.xscale = Scale(self.parent, variable=self.scalevar, from_=1, to=len(self.ct.filenames),
 							orient=HORIZONTAL, command=self.change_frame)
 
 		self.canvas.create_image(0, 0, anchor=NW, image=self.cur_frame)
-		self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
+		if cfg.AID_IMG != 'default':
+			self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
 
-		self.object_id_box = Listbox(self.parent)
-		self.switch_button = Button(self.parent, text="RGB <-> Depth")
+		self.object_id_box = Listbox(self.parent, width=50)
+		self.switch_button = Button(self.parent, text="RGB <-> Depth", state=DISABLED)
 		self.save_button = Button(self.parent, text="SAVE")
 		self.export_2voc = Button(self.parent, text="EXPORT2VOC")
 		self.quit_button = Button(self.parent, text="QUIT")
@@ -800,7 +805,8 @@ class Example(Frame):
 		self.export_2voc.grid(row=4, column=1)
 		self.quit_button.grid(row=5, column=1)
 		self.xscale.grid(row=6, sticky=W + E)
-		self.aid_canvas.grid(row=0, column=2, rowspan=6)
+		if cfg.AID_IMG != 'default':
+			self.aid_canvas.grid(row=1, column=2, rowspan=6)
 
 		# bindings
 		self.canvas.bind("<Key-Left>", self.prev_frame)
@@ -822,7 +828,7 @@ class Example(Frame):
 		self.object_id_box.bind("<Key-space>", self.next_frame_w_rop)  # the space key
 		self.canvas.bind("<Key-space>", self.next_frame_w_rop)  # the space key
 		self.object_id_box.bind("<<ListboxSelect>>", self.object_id_box_click)
-		self.switch_button.bind("<Button-1>", self.activate_switch)
+		# self.switch_button.bind("<Button-1>", self.activate_switch)
 		self.save_button.bind("<Button-1>", self.save_xml)
 		self.export_2voc.bind("<Button-1>", self.save_xml2voc)
 		self.quit_button.bind("<Button-1>", self.quit)
@@ -869,20 +875,17 @@ class Example(Frame):
 				ok = False
 		if ok:
 			# close tracking library
-			if trackingLib != None:
+			if trackingLib is not None:
 				trackingLib.close_lib()
 			self.parent.destroy()
 
 	def save_images_with_bbox(self):
 		grabcanvas = ImageGrab.grab(bbox=self.get_canvas_box())
-		# grabcanvas.show()
 		frame_name = 'bbox' + str(self.ct.cur_frame_nr).zfill(6) + '.png'
 		path = os.path.join(cfg.BBOX_PREFIX, frame_name)
 		grabcanvas.save(path)
 
 	def update_after_jump(self):
-		# if cfg.BBOX_PREFIX != 'default':
-		# 	self.save_images_with_bbox()
 		self.cur_frame = ImageTk.PhotoImage(self.img)
 		self.display_anno()
 		self.parent.title(
@@ -1103,7 +1106,6 @@ class Example(Frame):
 		if self.state in ("ul", "ur", "ll", "lr", "c", "d"):
 			# Are we inside the window?
 			if True:  # not ((event.x<0) or (event.x>self.img.size[0]) or (event.y<0) or (event.y>self.img.size[1])):
-
 				# If we create a new rectangle, we check whether we moved
 				# since the first click (Non trivial rectangle)?
 				if (self.state != "d") or (abs(event.x - self.curx1) > 5) or (abs(event.y - self.cury1) > 5):
@@ -1140,15 +1142,6 @@ class Example(Frame):
 			self.display_class_assignations()
 			self.is_modified = True
 		self.state = ""
-
-	# def chose_object_id(self, event, idx):
-	# 	sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
-	# 	print "choseobject_id(self,event,id):", sempos.index, "pos: ", self.mousex, ",", self.mousey
-	# 	if sempos.index > - 1:
-	# 		self.ct.update_object_id(sempos.index, idx)
-	# 		self.display_anno()
-	# 		self.display_class_assignations()
-	# 		self.is_modified = True
 
 	# draw an anchor point at (x, y) coordinates
 	@staticmethod
@@ -1215,30 +1208,19 @@ class Example(Frame):
 			if x[i] < 0:
 				self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
 			else:
-				self.object_id_box.insert(END, str(i + 1) + " has class " + str(x[i]) + " [" + classnames[x[i]] + "]")
+				self.object_id_box.insert(END, "Human [" + str(i + 1) + "] belongs to group [" + str(x[i]) + "]")
 
 	# a listbox item has been clicked: choose the object class for
 	# a given object
 	def object_id_box_click(self, event):
 		self.clicked_object_id = self.object_id_box.curselection()
-		top = self.class_dlg = Toplevel()
-		length_of_dialog_box = 25 * len(classnames)
-		top.geometry("400x" + str(length_of_dialog_box) + "+" + str(self.winfo_rootx()) + "+" + str(self.winfo_rooty()))
-		top.title("Enter class label for chosen object")
-		class_id = 0
-		for classname in classnames:
-			button_text = str(class_id) + " " + classname
-			button = Button(top, text=button_text, command=lambda i=class_id: self.chose_class_nr(i))
-			button.pack(fill=X)
-			class_id += 1
 
-	def chose_class_nr(self, class_nr):
+		class_id = tkSimpleDialog.askinteger('Set BBOX ID', 'Enter group ID for chosen person or 0 if they are not in a group')
+		print str(class_id), ' is the class id for that human.'
+
 		object_id = int(self.clicked_object_id[0])
-		self.ct.class_assignations[object_id] = class_nr
-		self.class_dlg.destroy()
+		self.ct.class_assignations[object_id] = class_id
 		self.display_class_assignations()
-		# Put the focus on the canvas, else the listbox gets all events
-		self.canvas.focus_force()
 		self.is_modified = True
 
 	def debug_event(self, title):
