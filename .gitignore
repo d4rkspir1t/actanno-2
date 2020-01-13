@@ -2,3 +2,4 @@
 save.xml
 src/*.pyc
 kcltestimages/
+venv/
