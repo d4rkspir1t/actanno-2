@@ -1182,9 +1182,9 @@ class Example(Frame):
 		# Draw all rectangles
 		for (i, r) in enumerate(self.ct.get_rects()):
 			if i == sempos.index:
-				curcol = "blue"
+				curcol = "green"
 			else:
-				curcol = "red"
+				curcol = "green"
 			draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
 			draw.rectangle([r.x1 + 1, r.y1 + 1, r.x2 - 1, r.y2 - 1], outline=curcol)
 			draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)

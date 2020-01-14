@@ -121,10 +121,10 @@ def detect_and_track_people(files_to_detect_in):
             print object_id, ' - ', obj_rects[object_id]
             if object_id > max_id:
                 max_id = object_id
-            true_rects = [obj_rects[object_id][0] * ratw,
-                          obj_rects[object_id][1] * rath,
-                          obj_rects[object_id][2] * ratw,
-                          obj_rects[object_id][3] * rath,]
+            true_rects = [int(obj_rects[object_id][0] * ratw),
+                          int(obj_rects[object_id][1] * rath),
+                          int(obj_rects[object_id][2] * ratw),
+                          int(obj_rects[object_id][3] * rath)]
             save_frame['rects'][object_id] = true_rects
         print '>' *10
         frames.append(save_frame)
