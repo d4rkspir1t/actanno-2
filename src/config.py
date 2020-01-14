@@ -35,7 +35,7 @@ __C.DATASET_NAME = "default"
 __C.OWNER = "default"
 __C.AID_IMG = "default"
 __C.BBOX_PREFIX = "default"
-
+__C.HUM_TRA_PREFIX = "default"
 
 def _merge_a_into_b(a, b):
     """Merge config dictionary a into config dictionary b, clobbering the

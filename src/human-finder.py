@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import imutils
 from centroidtracker import CentroidTracker
-
+from pprint import pprint
 
 folder = '../kcltestimages/bbox_saves'
 tracked_bbox_output = os.path.join(folder, 'human_bbox.xml')
@@ -20,7 +20,7 @@ COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 ct = CentroidTracker()
 
 
-def write_xml(objects, rects, frame_path):
+def write_xml(frames, max_id):
     fd = None
     try:
         fd = open(tracked_bbox_output, 'w')
@@ -30,19 +30,18 @@ def write_xml(objects, rects, frame_path):
     print >> fd, "<tagset>"
     print >> fd, "  <video>"
     print >> fd, "	<videoName>" + 'Human_Detected_GroupAnnotated_Dataset' + "</videoName>"
-    for cur_object_id in range(maxid):
+    for cur_object_id in range(max_id+1):
         found_rects = False
-        for (i, f) in enumerate(self.frames):
-            for (j, r) in enumerate(f.get_rects()):
-                if r.object_id == cur_object_id + 1:
+        for idx, frame in enumerate(frames):
+            for obj_id, rect in frame['rects'].items():
+                if obj_id == cur_object_id:
                     if not found_rects:
                         found_rects = True
-                        fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(
-                            self.class_assignations[cur_object_id]) + "\">\n")
-                    s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
-                    s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
-                    s = s + "\" framenr=\"" + str(i + 1)
-                    s = s + "\" framefile=\"" + self.filenames[i] + "\"/>\n"
+                        fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(None) + "\">\n")
+                    s = "	  <bbox x=\"" + str(int(rect[0])) + "\" y=\"" + str(int(rect[1]))
+                    s = s + "\" width=\"" + str(int(rect[2] - rect[0] + 1)) + "\" height=\"" + str(int(rect[3] - rect[1] + 1))
+                    s = s + "\" framenr=\"" + str(idx + 1)
+                    s = s + "\" framefile=\"" + frame['path'] + "\"/>\n"
                     fd.write(s)
         if found_rects:
             print >> fd, "	</object>"
@@ -64,11 +63,19 @@ def get_files_to_analyse():
 
 
 def detect_and_track_people(files_to_detect_in):
+    frames = []
+    max_id = -1
     for image_path in files_to_detect_in:
-        trackers = cv2.MultiTracker_create()
+        save_frame = {'path': image_path,
+                      'rects': {}}
+
         image = cv2.imread(image_path)
+        oh, ow = image.shape[:2]
         frame = imutils.resize(image, width=400)
         (h, w) = frame.shape[:2]
+        rath = float(oh)/float(h)
+        ratw = float(ow)/float(w)
+        # print '%.2f, %.2f' % (rath, ratw)
         blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 0.007843, (300, 300), 127.5)
         net.setInput(blob)
         detections = net.forward()
@@ -112,11 +119,22 @@ def detect_and_track_people(files_to_detect_in):
             cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
         for object_id in objects.keys():
             print object_id, ' - ', obj_rects[object_id]
+            if object_id > max_id:
+                max_id = object_id
+            true_rects = [obj_rects[object_id][0] * ratw,
+                          obj_rects[object_id][1] * rath,
+                          obj_rects[object_id][2] * ratw,
+                          obj_rects[object_id][3] * rath,]
+            save_frame['rects'][object_id] = true_rects
         print '>' *10
-        cv2.imshow("Frame", frame)
-        cv2.waitKey(0)
+        frames.append(save_frame)
+        # cv2.imshow("Frame", frame)
+        # cv2.waitKey(0)
+    return frames, max_id
 
 
 if __name__ == '__main__':
     files_to_detect_in = get_files_to_analyse()
-    detect_and_track_people(files_to_detect_in)
+    frames, max_id = detect_and_track_people(files_to_detect_in)
+    pprint(frames)
+    write_xml(frames, max_id)

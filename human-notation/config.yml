@@ -2,6 +2,7 @@ DATASET_NAME: 'SAIR.ELP'
 OWNER: 'SAIR lab - KCL'
 VOC_DIR: 'voc/'
 XML_PREFIX: '/HtoG.xml'
+HUM_TRA_PREFIX: '/human_bbox.xml'
 RGB_PREFIX: '/bbox'
 AID_IMG: 'default'
 CLASSES: ["N/A"]

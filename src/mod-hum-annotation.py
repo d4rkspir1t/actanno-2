@@ -308,6 +308,7 @@ class AAController:
 			self.depth_available = False
 
 		self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
+		self.human_tracker_xml = cfg.MAIN_DIR + cfg.HUM_TRA_PREFIX
 		if cfg.AID_IMG != 'default':
 			self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
 		# If the given XML file exists, parse it
@@ -325,6 +326,9 @@ class AAController:
 				# tkMessageBox.showinfo(TITLE, s)
 				# sys.exit(1)
 				tkMessageBox.showinfo(TITLE, "XML File " + self.output_filename + " does not exist. Creating a new one.")
+				if cfg.HUM_TRA_PREFIX is not "default":
+					self.load_human_tracked_xml()
+					print 'LOADING TRIGGERED'
 
 	@staticmethod
 	def usage():
@@ -705,6 +709,66 @@ class AAController:
 			# Add the classnr to the object_id array. Grow if necessary
 			anr = int(get_att(a, "nr"))
 			aclass = int(get_att(a, "class"))
+			# print "-----",anr,aclass
+			# print len(self.ClassAssignations)
+			if len(self.class_assignations) < anr:
+				# print "Growing object_id:"
+				self.class_assignations += [None] * (anr - len(self.class_assignations))
+			self.class_assignations[anr - 1] = aclass
+			# print "size of object_id array:", len(self.ClassAssignations), "array:", self.ClassAssignations
+
+			# Get all the bounding boxes for this object
+			bbs = a.findall("bbox")
+			if len(bbs) < 1:
+				tkMessageBox.showinfo(TITLE, "No <bbox> tags found for an object in the input XML file!")
+				sys.exit(1)
+			for bb in bbs:
+
+				# Add the bounding box to the frames() list
+				bfnr = int(get_att(bb, "framenr"))
+				bx = int(get_att(bb, "x"))
+				by = int(get_att(bb, "y"))
+				bw = int(get_att(bb, "width"))
+				bh = int(get_att(bb, "height"))
+				try:
+					self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1)
+				except IndexError:
+					print "*** ERROR ***"
+					print "The XML file contains rectangles in frame numbers which are outside of the video"
+					print "(frame number too large). Please check whether the XML file really fits to these"
+					print "frames."
+					sys.exit(1)
+
+	def load_human_tracked_xml(self):
+		tree = xml.parse(self.human_tracker_xml)
+		# root_element = tree.getroot()
+
+		# Get the single video tag
+		vids = tree.findall("video")
+		if len(vids) < 1:
+			tkMessageBox.showinfo(TITLE, "No <video> tag found in the input XML file!")
+			sys.exit(1)
+		if len(vids) > 1:
+			tkMessageBox.showinfo(TITLE, "Currently only a single <video> tag is supported per XML file!")
+			sys.exit(1)
+		vid = vids[0]
+
+		# Get the video name
+		# x=getSingleTag(vid,"videoName")
+		# if (x.text is None) or (len(x.text)==0) or (x.text=="NO-NAME"):
+		#	tkMessageBox.showinfo(TITLE, "The video name in the given XML file is empty. Please provide the correct name before saving the file.")
+		#	self.videoname="NO-NAME"
+		# else:
+		#	self.videoname=x.text
+
+		# Get all the objects
+		objectnodes = vid.findall("object")
+		if len(objectnodes) < 1:
+			tkMessageBox.showinfo(TITLE, "The given XML file does not contain any objects.")
+		for a in objectnodes:
+			# Add the classnr to the object_id array. Grow if necessary
+			anr = int(get_att(a, "nr"))
+			aclass = -1
 			# print "-----",anr,aclass
 			# print len(self.ClassAssignations)
 			if len(self.class_assignations) < anr:
