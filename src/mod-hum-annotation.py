@@ -408,11 +408,13 @@ class AAController:
     # Remove all rectangles of the current frame
     def delete_all_rects(self):
         self.frames[self.cur_frame_nr].rects = []
+        self.class_assignations[self.cur_frame_nr] = {}
 
     # Remove the rectangle with the given index from the list
     # of rectangles of the currently selected frame
     def delete_rect(self, index):
         print 'To delete: ', index
+        self.class_assignations[self.cur_frame_nr].pop(index+1, None)
         del self.frames[self.cur_frame_nr].rects[index]
 
     def next_frame(self, do_propagate, force):
@@ -865,6 +867,8 @@ class Example(Frame):
         self.canvas.bind("p", self.next_frame_w_prop_forced_selected_rect)
         self.canvas.bind("d", self.delete_cur_rect)
         self.canvas.bind("D", self.delete_all_rects)
+        self.canvas.bind("l", self.propagate_all_labels)
+        self.canvas.bind("o", self.propagate_label)
         self.object_id_box.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.canvas.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.object_id_box.bind("<<ListboxSelect>>", self.object_id_box_click)
@@ -1265,6 +1269,28 @@ class Example(Frame):
         print 'objectidboxclick object id ', object_id+1
         print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
         self.ct.class_assignations[self.ct.cur_frame_nr][object_id+1] = class_id
+        self.display_class_assignations()
+        self.is_modified = True
+
+    def propagate_label(self, event):
+        sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
+        print sempos.index
+        if sempos.index > -1:
+            for frame_no in range(self.ct.cur_frame_nr+1, len(self.ct.class_assignations)):
+                if sempos.index+1 in self.ct.class_assignations[frame_no].keys():
+                    # print 'could propagate label ', frame_no, sempos.index+1
+                    self.ct.class_assignations[frame_no][sempos.index+1] = self.ct.class_assignations[self.ct.cur_frame_nr][sempos.index+1]
+        self.display_anno()
+        self.display_class_assignations()
+        self.is_modified = True
+
+    def propagate_all_labels(self, event):
+        for frame_no in range(self.ct.cur_frame_nr + 1, len(self.ct.class_assignations)):
+            # print 'could propagate label ', frame_no, sempos.index+1
+            for object_id in self.ct.class_assignations[self.ct.cur_frame_nr].keys():
+                if object_id in self.ct.class_assignations[frame_no].keys():
+                    self.ct.class_assignations[frame_no][object_id] = self.ct.class_assignations[self.ct.cur_frame_nr][object_id]
+        self.display_anno()
         self.display_class_assignations()
         self.is_modified = True
 
