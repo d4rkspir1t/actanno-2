@@ -37,11 +37,12 @@ def write_xml(frames, max_id):
                 if obj_id == cur_object_id:
                     if not found_rects:
                         found_rects = True
-                        fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(None) + "\">\n")
+                        fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\">\n")
                     s = "	  <bbox x=\"" + str(int(rect[0])) + "\" y=\"" + str(int(rect[1]))
                     s = s + "\" width=\"" + str(int(rect[2] - rect[0] + 1)) + "\" height=\"" + str(int(rect[3] - rect[1] + 1))
                     s = s + "\" framenr=\"" + str(idx + 1)
-                    s = s + "\" framefile=\"" + frame['path'] + "\"/>\n"
+                    s = s + "\" framefile=\"" + frame['path']
+                    s = s + "\" class=\"" + str(None) + "\"/>\n"
                     fd.write(s)
         if found_rects:
             print >> fd, "	</object>"

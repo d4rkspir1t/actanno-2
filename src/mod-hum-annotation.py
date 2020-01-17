@@ -278,6 +278,7 @@ class AAController:
             self.usage()
         for i in range(len(self.filenames)):
             self.frames.append(AAFrame())
+            self.class_assignations.append({})
 
         # if depth
         if cfg.D_PREFIX != "default":
@@ -344,8 +345,9 @@ class AAController:
 
         # Check for unassigned ClassAssignations (no known object class)
         msg2 = ''
-        for fr_no in range(len(self.frames)):
-            for (i, x) in enumerate(self.class_assignations[fr_no]):
+        print 'fr len ', len(self.frames)
+        for fr_no in range(len(self.frames)-1):
+            for (i, x) in self.class_assignations[fr_no].items():
                 if x < 0:
                     msg2 = msg2 + str(i + 1) + ","
             if msg2 != '':
@@ -420,7 +422,6 @@ class AAController:
         # propagate the previous ones
         if do_propagate:
             x = len(self.frames[self.cur_frame_nr].rects)
-
             print "we have", x, "frames"
             if x > 0 and not force:
                 print "No propagation, target frame is not empty"
@@ -430,7 +431,8 @@ class AAController:
                 if y > 0:
                     # Tracking code goes here .....
                     print "Propagating ", y, "rectangle(s) to next frame"
-
+                    prev_frame_classes = self.class_assignations[self.cur_frame_nr - 1].copy()
+                    self.class_assignations[self.cur_frame_nr] = prev_frame_classes
                     if trackingLib is None:
                         # simple copy
                         print "simple copy"
@@ -463,7 +465,7 @@ class AAController:
                     print "No frames to propagate"
         else:
             self.cur_frame()
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_image
 
     def next_frame_prop_current_rect(self, rect_index):
@@ -475,6 +477,7 @@ class AAController:
             print "Propagating rectangle", propagate_id, " to new frame"
             x = len(self.frames[self.cur_frame_nr].rects)
             y = len(self.frames[self.cur_frame_nr - 1].rects)
+            self.class_assignations[self.cur_frame_nr][propagate_id] = self.class_assignations[self.cur_frame_nr-1][propagate_id]
             print "we have ", x, " objects"
             print "we had  ", y, " objects"
 
@@ -525,12 +528,12 @@ class AAController:
                 self.frames[self.cur_frame_nr].rects.append(rect_propagated)
 
         # self.curFrame()
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_image
 
     def change_frame(self, id_frame):
         self.cur_frame_nr = int(id_frame) - 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def next_frame_far(self):
@@ -538,13 +541,13 @@ class AAController:
             self.cur_frame_nr += JUMP_FRAMES
         else:
             self.cur_frame_nr = len(self.filenames) - 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame(self):
         if self.cur_frame_nr > 0:
             self.cur_frame_nr -= 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame_far(self):
@@ -552,7 +555,7 @@ class AAController:
             self.cur_frame_nr -= JUMP_FRAMES
         else:
             self.cur_frame_nr = 0
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def get_rects(self):
@@ -564,7 +567,8 @@ class AAController:
         if fnr >= len(self.frames):
             raise Exception()
         self.frames[fnr].get_rects().append(AARect(x1, y1, x2, y2, object_id))
-        self.class_assignations[fnr].append(aclass)
+        print 'addrect object id ', object_id
+        self.class_assignations[fnr][object_id] = aclass
 
     def del_rect(self, index):
         del self.frames[self.cur_frame_nr].get_rects()[index]
@@ -580,10 +584,12 @@ class AAController:
     # Tell the system the given object_id is used. If the array holding the classes
     # for the different ids is not large enough, grow it and insert -1 as class
     def use_object_id(self, new_id):
-        neededcap = new_id - len(self.class_assignations[self.cur_frame_nr])
+        print 'useobjectid curframenr ', self.cur_frame_nr
+        neededcap = new_id - len(self.class_assignations[self.cur_frame_nr].keys())
         if neededcap > 0:
             for i in range(neededcap):
-                self.class_assignations[self.cur_frame_nr].append(-1)
+                print 'useobjectid new_id ', new_id
+                self.class_assignations[self.cur_frame_nr-1][new_id] = -1
         print "new run id array", self.class_assignations[self.cur_frame_nr]
 
     def export_xml(self):
@@ -612,9 +618,9 @@ class AAController:
         for cur_object_id in range(maxid):
             found_rects = False
             for (i, f) in enumerate(self.frames):
-                print 'I am found BITCH ', self.class_assignations[i]
                 for (j, r) in enumerate(f.get_rects()):
-                    if r.object_id == cur_object_id + 1:
+                    if cur_object_id+1 in self.class_assignations[i].keys() and cur_object_id+1 == r.object_id:
+                        obj_class = self.class_assignations[i][r.object_id]
                         if not found_rects:
                             found_rects = True
                             fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\">\n")
@@ -622,7 +628,9 @@ class AAController:
                         s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
                         s = s + "\" framenr=\"" + str(i + 1)
                         s = s + "\" framefile=\"" + self.filenames[i]
-                        s = s + "\" class=\"" + str(self.class_assignations[i][cur_object_id]) + "\"/>\n"
+                        print 'exportxmlfilename object id ', cur_object_id+1
+                        print 'objclass ', obj_class
+                        s = s + "\" class=\"" + str(obj_class) + "\"/>\n"
                         fd.write(s)
             if found_rects:
                 print >> fd, "	</object>"
@@ -659,7 +667,7 @@ class AAController:
 
             for (j, r) in enumerate(f.get_rects()):
                 print >> fd, "	<object>"
-                print >> fd, "		<name>" + classnames[self.class_assignations[i][r.object_id - 1]] + "</name>"
+                print >> fd, "		<name>" + classnames[self.class_assignations[i][r.object_id]] + "</name>"
                 print >> fd, "		<pose>unknown</pose>"
                 print >> fd, "		<truncated>-1</truncated>"
                 print >> fd, "		<difficult>0</difficult>"
@@ -712,7 +720,7 @@ class AAController:
                 bh = int(get_att(bb, "height"))
                 aclass = int(get_att(bb, "class"))
                 while len(self.class_assignations) < bfnr:
-                    self.class_assignations.append([])
+                    self.class_assignations.append({})
                 try:
                     self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, aclass)
                 except IndexError:
@@ -869,7 +877,8 @@ class Example(Frame):
         self.state = ""
         self.mousex = 1
         self.mousey = 1
-        self.object_id_proposed_for_new_rect = len(self.ct.class_assignations) + 1
+        print 'curframe ', self.ct.cur_frame_nr
+        self.object_id_proposed_for_new_rect = len(self.ct.class_assignations[self.ct.cur_frame_nr].keys()) + 1
         self.display_anno()
         self.display_class_assignations()
         self.fn_entry.delete(0, END)
@@ -889,9 +898,9 @@ class Example(Frame):
         msg = self.ct.check_validity()
         if len(self.fn_entry.get()) < 1:
             msg = msg + "The video name is empty.\n"
-        if len(msg) > 0:
-            tkMessageBox.showinfo(TITLE, "There are errors in the annotation:\n\n" + msg +
-                                  "\nThe file has been saved. Please address the problem(s) and save again.")
+        # if len(msg) > 0:
+        #     tkMessageBox.showinfo(TITLE, "There are errors in the annotation:\n\n" + msg +
+        #                           "\nThe file has been saved. Please address the problem(s) and save again.")
 
     def quit(self, event):
         print "quit method"
@@ -920,6 +929,7 @@ class Example(Frame):
     def update_after_jump(self):
         self.cur_frame = ImageTk.PhotoImage(self.img)
         self.display_anno()
+        self.display_class_assignations()
         self.parent.title(
             TITLE + " (frame nr." + str(self.ct.cur_frame_nr + 1) + " of " + str(len(self.ct.filenames)) + ")")
         self.canvas.update()
@@ -1235,12 +1245,8 @@ class Example(Frame):
 
     def display_class_assignations(self):
         self.object_id_box.delete(0, END)
-        try:
-            x = self.ct.class_assignations[self.ct.cur_frame_nr]
-        except IndexError:
-            while len(self.ct.class_assignations)-1 < self.ct.cur_frame_nr:
-                self.ct.class_assignations.append([])
-        x = self.ct.class_assignations[self.ct.cur_frame_nr]
+        print self.ct.class_assignations
+        x = self.ct.class_assignations[self.ct.cur_frame_nr].values()
         for i in range(len(x)):
             if x[i] < 0:
                 self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
@@ -1256,7 +1262,9 @@ class Example(Frame):
         print str(class_id), ' is the class id for that human.'
 
         object_id = int(self.clicked_object_id[0])
-        self.ct.class_assignations[self.ct.cur_frame_nr][object_id] = class_id
+        print 'objectidboxclick object id ', object_id+1
+        print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
+        self.ct.class_assignations[self.ct.cur_frame_nr][object_id+1] = class_id
         self.display_class_assignations()
         self.is_modified = True
 
