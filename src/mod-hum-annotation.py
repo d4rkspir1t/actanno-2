@@ -263,7 +263,7 @@ class AAController:
         # dataset name
         self.dataset_name = cfg.DATASET_NAME
         self.video_name = cfg.FOLDER_NAME
-        print "self.videoname=", self.video_name
+        # print "self.videoname=", self.video_name
         # owner name
         self.owner = cfg.OWNER
         # folder name
@@ -327,7 +327,7 @@ class AAController:
                 # sys.exit(1)
                 tkMessageBox.showinfo(TITLE, "XML File " + self.output_filename + " does not exist. Creating a new one.")
                 if cfg.HUM_TRA_PREFIX is not "default":
-                    print 'LOADING TRIGGERED'
+                    # print 'LOADING TRIGGERED'
                     self.load_human_tracked_xml()
 
     @staticmethod
@@ -345,7 +345,7 @@ class AAController:
 
         # Check for unassigned ClassAssignations (no known object class)
         msg2 = ''
-        print 'fr len ', len(self.frames)
+        # print 'fr len ', len(self.frames)
         for fr_no in range(len(self.frames)-1):
             for (i, x) in self.class_assignations[fr_no].items():
                 if x < 0:
@@ -413,7 +413,7 @@ class AAController:
     # Remove the rectangle with the given index from the list
     # of rectangles of the currently selected frame
     def delete_rect(self, index):
-        print 'To delete: ', index
+        # print 'To delete: ', index
         self.class_assignations[self.cur_frame_nr].pop(index+1, None)
         del self.frames[self.cur_frame_nr].rects[index]
 
@@ -569,7 +569,7 @@ class AAController:
         if fnr >= len(self.frames):
             raise Exception()
         self.frames[fnr].get_rects().append(AARect(x1, y1, x2, y2, object_id))
-        print 'addrect object id ', object_id
+        # print 'addrect object id ', object_id
         self.class_assignations[fnr][object_id] = aclass
 
     def del_rect(self, index):
@@ -586,11 +586,11 @@ class AAController:
     # Tell the system the given object_id is used. If the array holding the classes
     # for the different ids is not large enough, grow it and insert -1 as class
     def use_object_id(self, new_id):
-        print 'useobjectid curframenr ', self.cur_frame_nr
+        # print 'useobjectid curframenr ', self.cur_frame_nr
         neededcap = new_id - len(self.class_assignations[self.cur_frame_nr].keys())
         if neededcap > 0:
             for i in range(neededcap):
-                print 'useobjectid new_id ', new_id
+                # print 'useobjectid new_id ', new_id
                 self.class_assignations[self.cur_frame_nr-1][new_id] = -1
         print "new run id array", self.class_assignations[self.cur_frame_nr]
 
@@ -630,8 +630,8 @@ class AAController:
                         s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
                         s = s + "\" framenr=\"" + str(i + 1)
                         s = s + "\" framefile=\"" + self.filenames[i]
-                        print 'exportxmlfilename object id ', cur_object_id+1
-                        print 'objclass ', obj_class
+                        # print 'exportxmlfilename object id ', cur_object_id+1
+                        # print 'objclass ', obj_class
                         s = s + "\" class=\"" + str(obj_class) + "\"/>\n"
                         fd.write(s)
             if found_rects:
@@ -887,7 +887,7 @@ class Example(Frame):
         self.state = ""
         self.mousex = 1
         self.mousey = 1
-        print 'curframe ', self.ct.cur_frame_nr
+        # print 'curframe ', self.ct.cur_frame_nr
         self.object_id_proposed_for_new_rect = len(self.ct.class_assignations[self.ct.cur_frame_nr].keys()) + 1
         self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
         self.display_anno()
@@ -914,7 +914,7 @@ class Example(Frame):
         #                           "\nThe file has been saved. Please address the problem(s) and save again.")
 
     def quit(self, event):
-        print "quit method"
+        # print "quit method"
         self.ct.videoname = self.fn_entry.get()
         ok = True
 
@@ -1179,11 +1179,11 @@ class Example(Frame):
         self.display_anno()
 
     def right_mouse_down(self, event):
-        print "right mouse down"
+        # print "right mouse down"
         sempos = self.ct.get_sem_mouse_pos(event.x, event.y)
         self.cur_sem_pos = sempos
         self.oldY = event.y
-        print "sempos.index", sempos.index
+        # print "sempos.index", sempos.index
         if sempos.index >= 0:
             self.state = "i"
             r = self.ct.get_rects()[sempos.index]
@@ -1258,7 +1258,8 @@ class Example(Frame):
 
     def display_class_assignations(self):
         self.object_id_box.delete(0, END)
-        print self.ct.class_assignations
+        # UNCOMMENT THIS FOR CMD CLASS LABEL TRACKING
+        # print self.ct.class_assignations
         x = self.ct.class_assignations[self.ct.cur_frame_nr].values()
         for i in range(len(x)):
             if x[i] < 0:
@@ -1272,18 +1273,18 @@ class Example(Frame):
         self.clicked_object_id = self.object_id_box.curselection()
 
         class_id = tkSimpleDialog.askinteger('Set BBOX ID', 'Enter group ID for chosen person or 0 if they are not in a group')
-        print str(class_id), ' is the class id for that human.'
+        # print str(class_id), ' is the class id for that human.'
 
         object_id = int(self.clicked_object_id[0])
-        print 'objectidboxclick object id ', object_id+1
-        print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
+        # print 'objectidboxclick object id ', object_id+1
+        # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
         self.ct.class_assignations[self.ct.cur_frame_nr][object_id+1] = class_id
         self.display_class_assignations()
         self.is_modified = True
 
     def propagate_label(self, event):
         sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
-        print sempos.index
+        # print sempos.index
         if sempos.index > -1:
             for frame_no in range(self.ct.cur_frame_nr+1, len(self.ct.class_assignations)):
                 if sempos.index+1 in self.ct.class_assignations[frame_no].keys():
@@ -1305,7 +1306,7 @@ class Example(Frame):
 
     def debug_event(self, title):
         self.event_counter += 1
-        print 'event #' + str(self.event_counter), title
+        # print 'event #' + str(self.event_counter), title
 
     def set_next_id(self, event):
         given_id = tkSimpleDialog.askinteger('Set Next ID',
@@ -1315,7 +1316,7 @@ class Example(Frame):
 
 
 def onexit():
-    print "qqqq"
+    # print "qqqq"
     ex.quit(None)
 
 
@@ -1356,7 +1357,7 @@ def main():
         trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
 
     if trackingLib is not None:
-        print "JM tracking library loaded."
+        # print "JM tracking library loaded."
         trackingLib.init_lib()
     else:
         print "Failed to load JM tracking library."

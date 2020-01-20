@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import imutils
 from centroidtracker import CentroidTracker
-from pprint import pprint
+# from pprint import pprint
 
 folder = '../kcltestimages/bbox_saves'
 tracked_bbox_output = os.path.join(folder, 'human_bbox.xml')
@@ -59,7 +59,7 @@ def get_files_to_analyse():
                 path = os.path.join(folder, name)
                 files_to_detect_in.append(path)
                 name_no = int(name.split('.')[0].split('bbox')[-1])
-                print str(name_no)
+                # print str(name_no)
     return files_to_detect_in
 
 
@@ -137,5 +137,5 @@ def detect_and_track_people(files_to_detect_in):
 if __name__ == '__main__':
     files_to_detect_in = get_files_to_analyse()
     frames, max_id = detect_and_track_people(files_to_detect_in)
-    pprint(frames)
+    # pprint(frames)
     write_xml(frames, max_id)

@@ -262,7 +262,7 @@ class AAController:
 		# dataset name
 		self.dataset_name = cfg.DATASET_NAME
 		self.video_name = cfg.FOLDER_NAME
-		print "self.videoname=", self.video_name
+		# print "self.videoname=", self.video_name
 		# owner name
 		self.owner = cfg.OWNER
 		# folder name
@@ -410,7 +410,7 @@ class AAController:
 	# Remove the rectangle with the given index from the list
 	# of rectangles of the currently selected frame
 	def delete_rect(self, index):
-		print 'To delete: ', index
+		# print 'To delete: ', index
 		del self.frames[self.cur_frame_nr].rects[index]
 
 	def next_frame(self, do_propagate, force):
@@ -468,15 +468,15 @@ class AAController:
 
 	def next_frame_prop_current_rect(self, rect_index):
 		propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
-		print "Rect[", rect_index, "].object_id == ", propagate_id
+		# print "Rect[", rect_index, "].object_id == ", propagate_id
 
 		if self.cur_frame_nr < len(self.filenames) - 1:
 			self.cur_frame_nr += 1
-			print "Propagating rectangle", propagate_id, " to new frame"
+			# print "Propagating rectangle", propagate_id, " to new frame"
 			x = len(self.frames[self.cur_frame_nr].rects)
 			y = len(self.frames[self.cur_frame_nr - 1].rects)
-			print "we have ", x, " objects"
-			print "we had  ", y, " objects"
+			# print "we have ", x, " objects"
+			# print "we had  ", y, " objects"
 
 			# get old rect to propagate
 			rect_to_propagate = self.frames[self.cur_frame_nr - 1].rects[rect_index]
@@ -583,7 +583,7 @@ class AAController:
 		if neededcap > 0:
 			for i in range(neededcap):
 				self.class_assignations.append(-1)
-		print "new run id array", self.class_assignations
+		# print "new run id array", self.class_assignations
 
 	def export_xml(self):
 		self.export_xml_filename(self.output_filename)
@@ -857,7 +857,7 @@ class Example(Frame):
 								  "\nThe file has been saved. Please address the problem(s) and save again.")
 
 	def quit(self, event):
-		print "quit method"
+		# print "quit method"
 		self.ct.videoname = self.fn_entry.get()
 		ok = True
 
@@ -1123,11 +1123,11 @@ class Example(Frame):
 		self.display_anno()
 
 	def right_mouse_down(self, event):
-		print "right mouse down"
+		# print "right mouse down"
 		sempos = self.ct.get_sem_mouse_pos(event.x, event.y)
 		self.cur_sem_pos = sempos
 		self.oldY = event.y
-		print "sempos.index", sempos.index
+		# print "sempos.index", sempos.index
 		if sempos.index >= 0:
 			self.state = "i"
 			r = self.ct.get_rects()[sempos.index]
@@ -1244,11 +1244,11 @@ class Example(Frame):
 
 	def debug_event(self, title):
 		self.event_counter += 1
-		print 'event #' + str(self.event_counter), title
+		# print 'event #' + str(self.event_counter), title
 
 
 def onexit():
-	print "qqqq"
+	# print "qqqq"
 	ex.quit(None)
 
 
@@ -1263,7 +1263,7 @@ def main():
 
 	config_path = sys.argv[1]
 	cfg_file = os.path.join(config_path, 'config.yml')
-	print "Loading config from >%s<" % cfg_file
+	# print "Loading config from >%s<" % cfg_file
 	cfg_from_file(cfg_file)
 	folder_path = sys.argv[2]
 	cfg.MAIN_DIR = folder_path
@@ -1271,8 +1271,8 @@ def main():
 	from os.path import normpath, basename
 	cfg.FOLDER_NAME = basename(normpath(folder_path))
 	cfg.MAIN_DIR = folder_path
-	print "Configuration :"
-	print cfg
+	# print "Configuration :"
+	# print cfg
 	classnames = cfg.CLASSES
 
 	# load C++ JM tracking library
@@ -1289,11 +1289,11 @@ def main():
 		trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
 
 	if trackingLib is not None:
-		print "JM tracking library loaded."
+		# print "JM tracking library loaded."
 		trackingLib.init_lib()
 	else:
 		print "Failed to load JM tracking library."
-	print trackingLib
+	# print trackingLib
 
 	root = Tk()
 	root.protocol("WM_DELETE_WINDOW", onexit)
