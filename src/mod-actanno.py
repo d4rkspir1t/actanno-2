@@ -768,6 +768,7 @@ class Example(Frame):
 		self.cur_frame = ImageTk.PhotoImage(self.img)
 
 		self.aid_img = self.ct.set_aid()
+		self.aid_img = self.aid_img.resize((340, 808), Image.ANTIALIAS)
 		self.aid_frame = ImageTk.PhotoImage(self.aid_img)
 
 		self.img_trash = ImageTk.PhotoImage(Image.open(self.cur_path + "/trashcan.png"))
@@ -1222,7 +1223,7 @@ class Example(Frame):
 	def object_id_box_click(self, event):
 		self.clicked_object_id = self.object_id_box.curselection()
 		top = self.class_dlg = Toplevel()
-		length_of_dialog_box = 25 * len(classnames)
+		length_of_dialog_box = 30 * len(classnames)
 		top.geometry("400x" + str(length_of_dialog_box) + "+" + str(self.winfo_rootx()) + "+" + str(self.winfo_rooty()))
 		top.title("Enter class label for chosen object")
 		class_id = 0

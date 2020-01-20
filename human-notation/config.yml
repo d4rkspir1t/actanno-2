@@ -4,6 +4,6 @@ VOC_DIR: 'voc/'
 XML_PREFIX: '/HtoG.xml'
 HUM_TRA_PREFIX: '/human_bbox.xml'
 RGB_PREFIX: '/bbox'
-AID_IMG: 'default'
+AID_IMG: '/keybind_humanno.png'
 CLASSES: ["N/A"]
 BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/human-notation/bboxes'

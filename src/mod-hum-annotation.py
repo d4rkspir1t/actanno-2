@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar
+from Tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar, StringVar
 from Tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
 from PIL import Image
 from PIL import ImageDraw
@@ -467,7 +467,7 @@ class AAController:
                     print "No frames to propagate"
         else:
             self.cur_frame()
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_image
 
     def next_frame_prop_current_rect(self, rect_index):
@@ -530,12 +530,12 @@ class AAController:
                 self.frames[self.cur_frame_nr].rects.append(rect_propagated)
 
         # self.curFrame()
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_image
 
     def change_frame(self, id_frame):
         self.cur_frame_nr = int(id_frame) - 1
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def next_frame_far(self):
@@ -543,13 +543,13 @@ class AAController:
             self.cur_frame_nr += JUMP_FRAMES
         else:
             self.cur_frame_nr = len(self.filenames) - 1
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame(self):
         if self.cur_frame_nr > 0:
             self.cur_frame_nr -= 1
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame_far(self):
@@ -557,7 +557,7 @@ class AAController:
             self.cur_frame_nr -= JUMP_FRAMES
         else:
             self.cur_frame_nr = 0
-        # self.export_xml_filename("save.xml")
+        self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def get_rects(self):
@@ -669,7 +669,7 @@ class AAController:
 
             for (j, r) in enumerate(f.get_rects()):
                 print >> fd, "	<object>"
-                print >> fd, "		<name>" + classnames[self.class_assignations[i][r.object_id]] + "</name>"
+                print >> fd, "		<name>" + str(self.class_assignations[i][r.object_id]) + "</name>"
                 print >> fd, "		<pose>unknown</pose>"
                 print >> fd, "		<truncated>-1</truncated>"
                 print >> fd, "		<difficult>0</difficult>"
@@ -684,6 +684,7 @@ class AAController:
             print >> fd, "</annotation>"
             fd.close()
         print "Done !"
+        tkMessageBox.showinfo("VOC export", "File(s) saved successfully!")
 
     def parse_xml(self):
         tree = xml.parse(self.output_filename)
@@ -813,6 +814,7 @@ class Example(Frame):
 
         if cfg.AID_IMG != 'default':
             self.aid_img = self.ct.set_aid()
+            self.aid_img = self.aid_img.resize((361, 836), Image.ANTIALIAS)
             self.aid_frame = ImageTk.PhotoImage(self.aid_img)
 
         self.img_trash = ImageTk.PhotoImage(Image.open(self.cur_path + "/trashcan.png"))
@@ -831,6 +833,9 @@ class Example(Frame):
             self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
 
         self.object_id_box = Listbox(self.parent, width=50)
+        self.id_text_var = StringVar()
+        self.id_text_var.set("Next id: 0")
+        self.id_setter = Button(self.parent, textvariable=self.id_text_var)
         self.switch_button = Button(self.parent, text="RGB <-> Depth", state=DISABLED)
         self.save_button = Button(self.parent, text="SAVE")
         self.export_2voc = Button(self.parent, text="EXPORT2VOC")
@@ -842,13 +847,14 @@ class Example(Frame):
         self.canvas.grid(row=0, column=0, rowspan=6)
         self.object_id_box.grid(row=0, column=1, sticky=N + S)
         self.fn_entry.grid(row=1, column=1)
-        self.switch_button.grid(row=2, column=1)
+        self.id_setter.grid(row=2, column=1)
+        # self.switch_button.grid(row=2, column=1)
         self.save_button.grid(row=3, column=1)
         self.export_2voc.grid(row=4, column=1)
         self.quit_button.grid(row=5, column=1)
         self.xscale.grid(row=6, sticky=W + E)
         if cfg.AID_IMG != 'default':
-            self.aid_canvas.grid(row=1, column=2, rowspan=6)
+            self.aid_canvas.grid(row=0, column=3, rowspan=6)
 
         # bindings
         self.canvas.bind("<Key-Left>", self.prev_frame)
@@ -872,7 +878,7 @@ class Example(Frame):
         self.object_id_box.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.canvas.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.object_id_box.bind("<<ListboxSelect>>", self.object_id_box_click)
-        # self.switch_button.bind("<Button-1>", self.activate_switch)
+        self.id_setter.bind("<Button-1>", self.set_next_id)
         self.save_button.bind("<Button-1>", self.save_xml)
         self.export_2voc.bind("<Button-1>", self.save_xml2voc)
         self.quit_button.bind("<Button-1>", self.quit)
@@ -883,6 +889,7 @@ class Example(Frame):
         self.mousey = 1
         print 'curframe ', self.ct.cur_frame_nr
         self.object_id_proposed_for_new_rect = len(self.ct.class_assignations[self.ct.cur_frame_nr].keys()) + 1
+        self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
         self.display_anno()
         self.display_class_assignations()
         self.fn_entry.delete(0, END)
@@ -1063,6 +1070,7 @@ class Example(Frame):
         self.ct.export_xml()
         self.check_validity()
         self.is_modified = False
+        tkMessageBox.showinfo("Save", "File saved successfully!")
 
     def save_xml2voc(self, event):
         if cfg.BBOX_PREFIX != 'default':
@@ -1164,6 +1172,7 @@ class Example(Frame):
                         self.ct.use_object_id(self.cur_object_id)
                         self.display_class_assignations()
                         self.object_id_proposed_for_new_rect = self.object_id_proposed_for_new_rect + 1
+                        self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
             self.curx2 = event.x
             self.cury2 = event.y
         self.state = ""
@@ -1297,6 +1306,12 @@ class Example(Frame):
     def debug_event(self, title):
         self.event_counter += 1
         print 'event #' + str(self.event_counter), title
+
+    def set_next_id(self, event):
+        given_id = tkSimpleDialog.askinteger('Set Next ID',
+                                             'Enter the id for the next bounding box you draw')
+        self.object_id_proposed_for_new_rect = given_id
+        self.id_text_var.set("Next id %d" % self.object_id_proposed_for_new_rect)
 
 
 def onexit():
