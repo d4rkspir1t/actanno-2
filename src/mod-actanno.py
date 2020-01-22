@@ -842,10 +842,14 @@ class Example(Frame):
 
 	def get_canvas_box(self):
 		x = self.canvas.winfo_rootx() + self.canvas.winfo_x()
-		y = self.canvas.winfo_rooty() + self.canvas.winfo_y()
+		# print 'win ', self.canvas.winfo_x(), ' ', self.canvas.winfo_rootx()
+		# print 'win ', self.canvas.winfo_y(), ' ', self.canvas.winfo_rooty()
+		# y = self.canvas.winfo_rooty() + self.canvas.winfo_y()
+		y = self.canvas.winfo_rooty()
 		x1 = x + self.canvas.winfo_width()
 		y1 = y + self.canvas.winfo_height()
 		box = (x, y, x1, y1)
+		# print box
 		return box
 
 	def check_validity(self):
