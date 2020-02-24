@@ -106,3 +106,7 @@ Changelog:
 - begin development
 
 *****************************************************************************
+
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' IDENTIFIED BY 'password';
+frame_no INT(11), human_id INT(11), label INT(11))

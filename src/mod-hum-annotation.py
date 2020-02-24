@@ -23,6 +23,7 @@ from minimal_ctypes_opencv import *
 from config import cfg
 from config import cfg_from_file
 
+import mysql.connector as mysql
 
 def mkdir_p(path):
     import errno
@@ -46,7 +47,7 @@ CORNER_SIZE = 30
 CENTER_SIZE = 30
 JUMP_FRAMES = 25
 
-TITLE = "Actanno V3.0"
+TITLE = "Actanno V4.0"
 
 # ***************************************************************************
 # The data structure storing the annotations
@@ -94,6 +95,22 @@ bindings = "\
             8 : choseobjectId8 \n \
             9 : choseobjectId9 \n \
             0 : choseobjectId10 \n"
+
+db = mysql.connect(
+    host = "localhost",
+    user = "admin",
+    passwd = "password",
+    database = "class_assignments"
+)
+cursor = db.cursor()
+try:
+    cursor.execute("DESC hum_to_group")
+    print cursor.fetchall()
+except:
+    cursor.execute(
+        "CREATE TABLE hum_to_group (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, frame_no INT(11), human_id INT(11), label INT(11))")
+    cursor.execute("DESC hum_to_group")
+    print cursor.fetchall()
 
 
 def get_single_tag(tree, tagname):
@@ -250,6 +267,7 @@ class AAController:
         # An array holding an AAFrame object for each frame of the video
         self.frames = []
         # An array holding the classnr for each object nr. ("object_id")
+
         self.class_assignations = []
         # The nr. of the currently visible frame
         self.cur_frame_nr = 0
@@ -336,6 +354,14 @@ class AAController:
         print >> sys.stderr, sys.argv[0], " <output-xml-filename> <framefileprefix RGB> <framefileprefix depth>"
         sys.exit(1)
 
+    @staticmethod
+    def select_ca_frame_info(fr_no):
+        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %d" % fr_no
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        for info in frame_info:
+            print info
+
     # Check the current annotation for validity
     def check_validity(self):
         msg = ''
@@ -347,6 +373,7 @@ class AAController:
         msg2 = ''
         # print 'fr len ', len(self.frames)
         for fr_no in range(len(self.frames)-1):
+            self.select_ca_frame_info(fr_no)
             for (i, x) in self.class_assignations[fr_no].items():
                 if x < 0:
                     msg2 = msg2 + str(i + 1) + ","
@@ -405,17 +432,58 @@ class AAController:
         self.aid_img = png.convert('RGB')
         return self.aid_img
 
+    @staticmethod
+    def del_ca_frame_info(fr_no):
+        query = "SELECT COUNT(*) FROM hum_to_group;"
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
+
+        query = "DELETE FROM hum_to_group WHERE frame_no = %d" % fr_no
+        cursor.execute(query)
+        db.commit()
+
+        query = "SELECT COUNT(*) FROM hum_to_group;"
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
+
     # Remove all rectangles of the current frame
     def delete_all_rects(self):
         self.frames[self.cur_frame_nr].rects = []
+        self.del_ca_frame_info(self.cur_frame_nr)
         self.class_assignations[self.cur_frame_nr] = {}
+
+    @staticmethod
+    def del_ca_frame_single(fr_no, index):
+        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d" % fr_no
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
+
+        query = "DELETE FROM hum_to_group WHERE frame_no = %d AND human_id = %d" % (fr_no, index)
+        cursor.execute(query)
+        db.commit()
+
+        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d" % fr_no
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
 
     # Remove the rectangle with the given index from the list
     # of rectangles of the currently selected frame
     def delete_rect(self, index):
         # print 'To delete: ', index
+        self.del_ca_frame_single(self.cur_frame_nr, index+1)
         self.class_assignations[self.cur_frame_nr].pop(index+1, None)
         del self.frames[self.cur_frame_nr].rects[index]
+
+    @staticmethod
+    def insert_ca_frame_all(fr_info_array):
+        query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%d, %d, %d)"
+        cursor.executemany(query, fr_info_array)
+        db.commit()
+        print cursor.rowcount, "records inserted"
 
     def next_frame(self, do_propagate, force):
         if self.cur_frame_nr < len(self.filenames) - 1:
@@ -433,7 +501,12 @@ class AAController:
                 if y > 0:
                     # Tracking code goes here .....
                     print "Propagating ", y, "rectangle(s) to next frame"
+                    self.select_ca_frame_info(self.cur_frame_nr-1)
                     prev_frame_classes = self.class_assignations[self.cur_frame_nr - 1].copy()
+                    values = []
+                    for hum_no, label in prev_frame_classes:
+                        values.append((self.cur_frame_nr, hum_no, label))
+                    self.insert_ca_frame_all(values)
                     self.class_assignations[self.cur_frame_nr] = prev_frame_classes
                     if trackingLib is None:
                         # simple copy
@@ -479,6 +552,7 @@ class AAController:
             print "Propagating rectangle", propagate_id, " to new frame"
             x = len(self.frames[self.cur_frame_nr].rects)
             y = len(self.frames[self.cur_frame_nr - 1].rects)
+
             self.class_assignations[self.cur_frame_nr][propagate_id] = self.class_assignations[self.cur_frame_nr-1][propagate_id]
             print "we have ", x, " objects"
             print "we had  ", y, " objects"
