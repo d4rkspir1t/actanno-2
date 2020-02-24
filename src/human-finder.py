@@ -5,7 +5,7 @@ import imutils
 from centroidtracker import CentroidTracker
 # from pprint import pprint
 
-folder = '../kcltestimages/bbox_saves'
+folder = '../kcltestimages/bbox_rgb'
 tracked_bbox_output = os.path.join(folder, 'human_bbox.xml')
 ext = 'png'
 prototxt = '../rtod_helper/MobileNetSSD_deploy.prototxt.txt'
