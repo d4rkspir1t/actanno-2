@@ -3,3 +3,4 @@ save.xml
 src/*.pyc
 kcltestimages/
 venv/
+.idea
