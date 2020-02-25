@@ -267,7 +267,6 @@ class AAController:
         self.frames = []
         # An array holding the classnr for each object nr. ("object_id")
 
-        self.class_assignations = []
         # The nr. of the currently visible frame
         self.cur_frame_nr = 0
         self.cur_image = None
@@ -295,7 +294,6 @@ class AAController:
             self.usage()
         for i in range(len(self.filenames)):
             self.frames.append(AAFrame())
-            self.class_assignations.append({})
 
         # if depth
         if cfg.D_PREFIX != "default":
@@ -702,7 +700,6 @@ class AAController:
             for i in range(neededcap):
                 # print 'useobjectid new_id ', new_id
                 self.insert_ca_frame_label(self.cur_frame_nr-1, new_id, -1)
-        print "new run id array", self.class_assignations[self.cur_frame_nr]
 
     def export_xml(self):
         self.export_xml_filename(self.output_filename)
