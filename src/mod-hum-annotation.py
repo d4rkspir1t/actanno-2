@@ -356,11 +356,12 @@ class AAController:
 
     @staticmethod
     def select_ca_frame_info(fr_no):
-        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %d" % fr_no
+        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %d;" % fr_no
         cursor.execute(query)
         frame_info = cursor.fetchall()
         for info in frame_info:
             print info
+        return frame_info
 
     # Check the current annotation for validity
     def check_validity(self):
@@ -439,7 +440,7 @@ class AAController:
         frame_info = cursor.fetchall()
         print frame_info
 
-        query = "DELETE FROM hum_to_group WHERE frame_no = %d" % fr_no
+        query = "DELETE FROM hum_to_group WHERE frame_no = %d;" % fr_no
         cursor.execute(query)
         db.commit()
 
@@ -456,16 +457,16 @@ class AAController:
 
     @staticmethod
     def del_ca_frame_single(fr_no, index):
-        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d" % fr_no
+        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d;" % fr_no
         cursor.execute(query)
         frame_info = cursor.fetchall()
         print frame_info
 
-        query = "DELETE FROM hum_to_group WHERE frame_no = %d AND human_id = %d" % (fr_no, index)
+        query = "DELETE FROM hum_to_group WHERE frame_no = %d AND human_id = %d;" % (fr_no, index)
         cursor.execute(query)
         db.commit()
 
-        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d" % fr_no
+        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d;" % fr_no
         cursor.execute(query)
         frame_info = cursor.fetchall()
         print frame_info
@@ -480,7 +481,7 @@ class AAController:
 
     @staticmethod
     def insert_ca_frame_all(fr_info_array):
-        query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%d, %d, %d)"
+        query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%d, %d, %d);"
         cursor.executemany(query, fr_info_array)
         db.commit()
         print cursor.rowcount, "records inserted"
@@ -543,6 +544,29 @@ class AAController:
         self.export_xml_filename("save.xml")
         return self.cur_image
 
+    @staticmethod
+    def select_ca_frame_single(fr_no, obj_id):
+        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %d AND human_id = %d;" % (fr_no, obj_id)
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        for info in frame_info:
+            print info
+        return frame_info
+
+    @staticmethod
+    def update_ca_frame_single(fr_no, obj_id, label):
+        query = "UPDATE hum_to_group SET label = %d WHERE frame_no = %d AND human_id = %d;" % (label, fr_no, obj_id)
+        cursor.execute(query)
+        db.commit()
+
+    @staticmethod
+    def insert_ca_frame_label(fr_no, obj_id, label):
+        fr_info_array = (fr_no, obj_id, label)
+        query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%d, %d, %d);"
+        cursor.execute(query, fr_info_array)
+        db.commit()
+        print cursor.rowcount, "records inserted"
+
     def next_frame_prop_current_rect(self, rect_index):
         propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
         print "Rect[", rect_index, "].object_id == ", propagate_id
@@ -553,6 +577,12 @@ class AAController:
             x = len(self.frames[self.cur_frame_nr].rects)
             y = len(self.frames[self.cur_frame_nr - 1].rects)
 
+            frame_info = self.select_ca_frame_single(self.cur_frame_nr, propagate_id)
+            prev_frame_info = self.select_ca_frame_single(self.cur_frame_nr-1, propagate_id)
+            if len(frame_info) > 0:
+                self.update_ca_frame_single(self.cur_frame_nr, propagate_id, prev_frame_info[1])
+            else:
+                self.insert_ca_frame_label(self.cur_frame_nr, propagate_id, prev_frame_info[1])
             self.class_assignations[self.cur_frame_nr][propagate_id] = self.class_assignations[self.cur_frame_nr-1][propagate_id]
             print "we have ", x, " objects"
             print "we had  ", y, " objects"
@@ -644,6 +674,7 @@ class AAController:
             raise Exception()
         self.frames[fnr].get_rects().append(AARect(x1, y1, x2, y2, object_id))
         # print 'addrect object id ', object_id
+        self.insert_ca_frame_label(fnr, object_id, aclass)
         self.class_assignations[fnr][object_id] = aclass
 
     def del_rect(self, index):
@@ -657,14 +688,24 @@ class AAController:
         self.frames[self.cur_frame_nr].rects[index_rect].object_id = new_id
         self.use_object_id(new_id)
 
+    @staticmethod
+    def count_ca_frame_objects(fr_no):
+        query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %d;" % fr_no
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
+        return  frame_info
+
     # Tell the system the given object_id is used. If the array holding the classes
     # for the different ids is not large enough, grow it and insert -1 as class
     def use_object_id(self, new_id):
         # print 'useobjectid curframenr ', self.cur_frame_nr
+        self.count_ca_frame_objects(self.cur_frame_nr)
         neededcap = new_id - len(self.class_assignations[self.cur_frame_nr].keys())
         if neededcap > 0:
             for i in range(neededcap):
                 # print 'useobjectid new_id ', new_id
+                self.insert_ca_frame_label(self.cur_frame_nr-1, new_id, -1)
                 self.class_assignations[self.cur_frame_nr-1][new_id] = -1
         print "new run id array", self.class_assignations[self.cur_frame_nr]
 
@@ -695,7 +736,11 @@ class AAController:
             found_rects = False
             for (i, f) in enumerate(self.frames):
                 for (j, r) in enumerate(f.get_rects()):
+                    frame_info = self.select_ca_frame_info(i)
+                    frame_keys = [info[0] for info in frame_info]
                     if cur_object_id+1 in self.class_assignations[i].keys() and cur_object_id+1 == r.object_id:
+                        frame_info = self.select_ca_frame_single(i, r.object_id)
+                        label = frame_info[1]
                         obj_class = self.class_assignations[i][r.object_id]
                         if not found_rects:
                             found_rects = True
@@ -742,6 +787,8 @@ class AAController:
             print >> fd, "	<segmented>0</segmented>"
 
             for (j, r) in enumerate(f.get_rects()):
+                frame_info = self.select_ca_frame_single(i, r.object_id)
+                label = frame_info[1]
                 print >> fd, "	<object>"
                 print >> fd, "		<name>" + str(self.class_assignations[i][r.object_id]) + "</name>"
                 print >> fd, "		<pose>unknown</pose>"
@@ -759,6 +806,14 @@ class AAController:
             fd.close()
         print "Done !"
         tkMessageBox.showinfo("VOC export", "File(s) saved successfully!")
+
+    @staticmethod
+    def count_ca_frames():
+        query = "SELECT COUNT(*) FROM hum_to_group;"
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        print frame_info
+        return frame_info
 
     def parse_xml(self):
         tree = xml.parse(self.output_filename)
@@ -796,8 +851,9 @@ class AAController:
                 bw = int(get_att(bb, "width"))
                 bh = int(get_att(bb, "height"))
                 aclass = int(get_att(bb, "class"))
-                while len(self.class_assignations) < bfnr:
-                    self.class_assignations.append({})
+                count = self.count_ca_frames()
+                while len(self.class_assignations) < bfnr: # REDUNDANT
+                    self.class_assignations.append({}) # REDUNDANT
                 try:
                     self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, aclass)
                 except IndexError:
@@ -962,6 +1018,7 @@ class Example(Frame):
         self.mousex = 1
         self.mousey = 1
         # print 'curframe ', self.ct.cur_frame_nr
+        frame_info = self.ct.count_ca_frame_objects(self.ct.cur_frame_nr)
         self.object_id_proposed_for_new_rect = len(self.ct.class_assignations[self.ct.cur_frame_nr].keys()) + 1
         self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
         self.display_anno()
@@ -1338,6 +1395,9 @@ class Example(Frame):
         self.object_id_box.delete(0, END)
         # UNCOMMENT THIS FOR CMD CLASS LABEL TRACKING
         # print self.ct.class_assignations
+        frame_info = self.ct.select_ca_frame_info(self.ct.cur_frame_nr)
+        frame_keys = [info[0] for info in frame_info]
+        frame_labels = [info[1] for info in frame_info]
         x = self.ct.class_assignations[self.ct.cur_frame_nr].values()
         for i in range(len(x)):
             if x[i] < 0:
@@ -1356,6 +1416,7 @@ class Example(Frame):
         object_id = int(self.clicked_object_id[0])
         # print 'objectidboxclick object id ', object_id+1
         # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
+        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, object_id+1, class_id)
         self.ct.class_assignations[self.ct.cur_frame_nr][object_id+1] = class_id
         self.display_class_assignations()
         self.is_modified = True
@@ -1364,19 +1425,38 @@ class Example(Frame):
         sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
         # print sempos.index
         if sempos.index > -1:
+            count = self.ct.count_ca_frames()
             for frame_no in range(self.ct.cur_frame_nr+1, len(self.ct.class_assignations)):
+                frame_info = self.ct.select_ca_frame_info(frame_no)
                 if sempos.index+1 in self.ct.class_assignations[frame_no].keys():
                     # print 'could propagate label ', frame_no, sempos.index+1
+                    frame_info = self.ct.select_ca_frame_single(frame_no, sempos.index+1)
+                    prev_frame_info = self.ct.select_ca_frame_single(self.ct.cur_frame_nr, sempos.index+1)
+                    if len(frame_info) > 0:
+                        self.ct.update_ca_frame_single(frame_no, sempos.index+1, prev_frame_info[1])
+                    else:
+                        self.ct.insert_ca_frame_label(frame_no, sempos.index+1, prev_frame_info[1])
                     self.ct.class_assignations[frame_no][sempos.index+1] = self.ct.class_assignations[self.ct.cur_frame_nr][sempos.index+1]
         self.display_anno()
         self.display_class_assignations()
         self.is_modified = True
 
     def propagate_all_labels(self, event):
+        count = self.ct.count_ca_frames()
         for frame_no in range(self.ct.cur_frame_nr + 1, len(self.ct.class_assignations)):
             # print 'could propagate label ', frame_no, sempos.index+1
+            frame_all_info = self.ct.count_ca_frame_objects(frame_no)
+            frame_all_keys = [info[0] for info in frame_info]
+            prev_frame_all_info = self.ct.count_ca_frame_objects(self.ct.cur_frame_nr)
+            prev_frame_all_keys = [info[0] for info in frame_info]
             for object_id in self.ct.class_assignations[self.ct.cur_frame_nr].keys():
                 if object_id in self.ct.class_assignations[frame_no].keys():
+                    frame_info = self.ct.select_ca_frame_single(frame_no, object_id)
+                    prev_frame_info = self.ct.select_ca_frame_single(self.ct.cur_frame_nr, object_id)
+                    if len(frame_info) > 0:
+                        self.ct.update_ca_frame_single(frame_no, object_id, prev_frame_info[1])
+                    else:
+                        self.ct.insert_ca_frame_label(frame_no, object_id, prev_frame_info[1])
                     self.ct.class_assignations[frame_no][object_id] = self.ct.class_assignations[self.ct.cur_frame_nr][object_id]
         self.display_anno()
         self.display_class_assignations()
