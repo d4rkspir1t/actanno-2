@@ -1394,11 +1394,11 @@ class Example(Frame):
         frame_keys = [info[0] for info in frame_info]
         frame_labels = [info[1] for info in frame_info]
         x = frame_labels
-        for i in range(len(x)):
-            if x[i] < 0:
-                self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
+        for idx, key in enumerate(frame_keys):
+            if frame_labels[idx] < 0:
+                self.object_id_box.insert(END, str(key + 1) + " has no assigned class ")
             else:
-                self.object_id_box.insert(END, "Human [" + str(i + 1) + "] belongs to group [" + str(x[i]) + "]")
+                self.object_id_box.insert(END, "Human [" + str(key + 1) + "] belongs to group [" + str(frame_labels[idx]) + "]")
 
     # a listbox item has been clicked: choose the object class for
     # a given object
