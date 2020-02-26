@@ -842,7 +842,13 @@ class AAController:
                 by = int(get_att(bb, "y"))
                 bw = int(get_att(bb, "width"))
                 bh = int(get_att(bb, "height"))
-                aclass = int(get_att(bb, "class"))
+                
+                in_class = get_att(bb, "class")
+                if in_class != 'None':
+                    aclass = int(get_att(bb, "class"))
+                else:
+                    aclass = -1
+                    
                 try:
                     self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, aclass)
                 except IndexError:
