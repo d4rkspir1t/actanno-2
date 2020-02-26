@@ -535,7 +535,7 @@ class AAController:
                     print "No frames to propagate"
         else:
             self.cur_frame()
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_image
 
     @staticmethod
@@ -629,12 +629,12 @@ class AAController:
                 self.frames[self.cur_frame_nr].rects.append(rect_propagated)
 
         # self.curFrame()
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_image
 
     def change_frame(self, id_frame):
         self.cur_frame_nr = int(id_frame) - 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def next_frame_far(self):
@@ -642,13 +642,13 @@ class AAController:
             self.cur_frame_nr += JUMP_FRAMES
         else:
             self.cur_frame_nr = len(self.filenames) - 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame(self):
         if self.cur_frame_nr > 0:
             self.cur_frame_nr -= 1
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def prev_frame_far(self):
@@ -656,7 +656,7 @@ class AAController:
             self.cur_frame_nr -= JUMP_FRAMES
         else:
             self.cur_frame_nr = 0
-        self.export_xml_filename("save.xml")
+        # self.export_xml_filename("save.xml")
         return self.cur_frame()
 
     def get_rects(self):
@@ -687,7 +687,7 @@ class AAController:
         query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %s;" % fr_no
         cursor.execute(query)
         frame_info = cursor.fetchone()[0]
-        print 'ln 692 count frame objects: ', frame_info
+        # print 'ln 692 count frame objects: ', frame_info
         return frame_info
 
     # Tell the system the given object_id is used. If the array holding the classes
@@ -703,6 +703,14 @@ class AAController:
 
     def export_xml(self):
         self.export_xml_filename(self.output_filename)
+
+    @staticmethod
+    def select_ca_frame_numbers():
+        query = "SELECT frame_no FROM hum_to_group GROUP BY frame_no;"
+        cursor.execute(query)
+        frame_info = cursor.fetchall()
+        # print 'ln 708 count frame objects: ', frame_info
+        return frame_info
 
     def export_xml_filename(self, filename):
         # Get maximum running id
@@ -724,16 +732,25 @@ class AAController:
 
         # self.filenames[self.curFrameNr]
         # Travers all different running id's
+        frame_info = self.select_ca_frame_numbers()
+        frame_nos = [info[0] for info in frame_info]
+        # print 'frame nos: ', frame_nos
+        mysql_dict = {}
+        for frame_id in frame_nos:
+            frame_info = self.select_ca_frame_info(frame_id)
+            mysql_dict[frame_id] = {}
+            for info in frame_info:
+                human_id = info[0]
+                human_label = info[1]
+                mysql_dict[frame_id][human_id] = human_label
+        print 'MySQL read, converted to dict on SAVE'
+
         for cur_object_id in range(maxid):
             found_rects = False
             for (i, f) in enumerate(self.frames):
                 for (j, r) in enumerate(f.get_rects()):
-                    frame_info = self.select_ca_frame_info(i)
-                    frame_keys = [info[0] for info in frame_info]
-                    if cur_object_id+1 in frame_keys and cur_object_id+1 == r.object_id:
-                        frame_info = self.select_ca_frame_single(i, r.object_id)
-                        label = frame_info[1]
-                        obj_class = label
+                    if cur_object_id+1 in mysql_dict[i].keys() and cur_object_id+1 == r.object_id:
+                        obj_class = mysql_dict[i][r.object_id]
                         if not found_rects:
                             found_rects = True
                             fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\">\n")
@@ -804,7 +821,7 @@ class AAController:
         query = "SELECT COUNT(*) FROM hum_to_group GROUP BY frame_no;"
         cursor.execute(query)
         frame_info = cursor.fetchall()
-        print 'ln 811 count all frames: ', frame_info
+        # print 'ln 811 count all frames: ', frame_info
         return len(frame_info)
 
     def parse_xml(self):
