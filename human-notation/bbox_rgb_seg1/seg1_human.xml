@@ -8,8 +8,6 @@
 	  <bbox x="0" y="76" width="99" height="407" framenr="3" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000002.png" class="0"/>
 	  <bbox x="0" y="77" width="93" height="396" framenr="4" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000003.png" class="0"/>
 	  <bbox x="0" y="78" width="53" height="405" framenr="5" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000004.png" class="0"/>
-	  <bbox x="0" y="78" width="53" height="404" framenr="6" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000005.png" class="0"/>
-	  <bbox x="0" y="78" width="53" height="404" framenr="7" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000006.png" class="0"/>
 	  <bbox x="312" y="261" width="64" height="213" framenr="8" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000007.png" class="0"/>
 	  <bbox x="312" y="261" width="64" height="213" framenr="9" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000008.png" class="0"/>
 	  <bbox x="245" y="250" width="128" height="228" framenr="10" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000009.png" class="0"/>
@@ -257,40 +255,40 @@
 	<object nr="6">
 	  <bbox x="597" y="273" width="46" height="210" framenr="5" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000004.png" class="0"/>
 	  <bbox x="562" y="274" width="45" height="209" framenr="6" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000005.png" class="0"/>
-	  <bbox x="562" y="274" width="45" height="208" framenr="7" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000006.png" class="0"/>
-	  <bbox x="282" y="318" width="99" height="136" framenr="22" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000021.png" class="0"/>
-	  <bbox x="282" y="318" width="99" height="136" framenr="23" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000022.png" class="0"/>
-	  <bbox x="282" y="318" width="99" height="136" framenr="24" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000023.png" class="0"/>
-	  <bbox x="282" y="318" width="99" height="136" framenr="25" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000024.png" class="0"/>
-	  <bbox x="276" y="314" width="100" height="138" framenr="26" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000025.png" class="0"/>
-	  <bbox x="276" y="318" width="100" height="132" framenr="27" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000026.png" class="0"/>
-	  <bbox x="276" y="321" width="100" height="129" framenr="28" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000027.png" class="0"/>
-	  <bbox x="277" y="322" width="97" height="127" framenr="29" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000028.png" class="0"/>
-	  <bbox x="279" y="319" width="92" height="130" framenr="30" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000029.png" class="0"/>
-	  <bbox x="276" y="313" width="98" height="136" framenr="31" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000030.png" class="0"/>
-	  <bbox x="272" y="322" width="101" height="130" framenr="32" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000031.png" class="0"/>
-	  <bbox x="276" y="314" width="100" height="136" framenr="33" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000032.png" class="0"/>
-	  <bbox x="282" y="311" width="91" height="136" framenr="34" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000033.png" class="0"/>
-	  <bbox x="282" y="308" width="86" height="136" framenr="35" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000034.png" class="0"/>
-	  <bbox x="242" y="281" width="41" height="187" framenr="36" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000035.png" class="0"/>
-	  <bbox x="280" y="311" width="88" height="133" framenr="37" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000036.png" class="0"/>
-	  <bbox x="277" y="310" width="89" height="137" framenr="38" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000037.png" class="0"/>
-	  <bbox x="277" y="310" width="93" height="137" framenr="39" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000038.png" class="0"/>
-	  <bbox x="276" y="310" width="94" height="139" framenr="40" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000039.png" class="0"/>
-	  <bbox x="274" y="308" width="97" height="139" framenr="41" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000040.png" class="0"/>
-	  <bbox x="274" y="308" width="97" height="139" framenr="42" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000041.png" class="0"/>
-	  <bbox x="274" y="308" width="97" height="139" framenr="43" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000042.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="44" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000043.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="45" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000044.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="46" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000045.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="47" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000046.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="48" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000047.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="49" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000048.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="50" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000049.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="51" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000050.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="52" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000051.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="53" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000052.png" class="0"/>
-	  <bbox x="274" y="310" width="100" height="139" framenr="54" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000053.png" class="0"/>
+	  <bbox x="562" y="274" width="45" height="208" framenr="7" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000006.png" class="2"/>
+	  <bbox x="282" y="318" width="99" height="136" framenr="22" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000021.png" class="2"/>
+	  <bbox x="282" y="318" width="99" height="136" framenr="23" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000022.png" class="2"/>
+	  <bbox x="282" y="318" width="99" height="136" framenr="24" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000023.png" class="2"/>
+	  <bbox x="282" y="318" width="99" height="136" framenr="25" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000024.png" class="2"/>
+	  <bbox x="276" y="314" width="100" height="138" framenr="26" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000025.png" class="2"/>
+	  <bbox x="276" y="318" width="100" height="132" framenr="27" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000026.png" class="2"/>
+	  <bbox x="276" y="321" width="100" height="129" framenr="28" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000027.png" class="2"/>
+	  <bbox x="277" y="322" width="97" height="127" framenr="29" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000028.png" class="2"/>
+	  <bbox x="279" y="319" width="92" height="130" framenr="30" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000029.png" class="2"/>
+	  <bbox x="276" y="313" width="98" height="136" framenr="31" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000030.png" class="2"/>
+	  <bbox x="272" y="322" width="101" height="130" framenr="32" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000031.png" class="2"/>
+	  <bbox x="276" y="314" width="100" height="136" framenr="33" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000032.png" class="2"/>
+	  <bbox x="282" y="311" width="91" height="136" framenr="34" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000033.png" class="2"/>
+	  <bbox x="282" y="308" width="86" height="136" framenr="35" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000034.png" class="2"/>
+	  <bbox x="242" y="281" width="41" height="187" framenr="36" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000035.png" class="2"/>
+	  <bbox x="280" y="311" width="88" height="133" framenr="37" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000036.png" class="2"/>
+	  <bbox x="277" y="310" width="89" height="137" framenr="38" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000037.png" class="2"/>
+	  <bbox x="277" y="310" width="93" height="137" framenr="39" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000038.png" class="2"/>
+	  <bbox x="276" y="310" width="94" height="139" framenr="40" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000039.png" class="2"/>
+	  <bbox x="274" y="308" width="97" height="139" framenr="41" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000040.png" class="2"/>
+	  <bbox x="274" y="308" width="97" height="139" framenr="42" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000041.png" class="2"/>
+	  <bbox x="274" y="308" width="97" height="139" framenr="43" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000042.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="44" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000043.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="45" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000044.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="46" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000045.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="47" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000046.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="48" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000047.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="49" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000048.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="50" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000049.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="51" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000050.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="52" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000051.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="53" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000052.png" class="2"/>
+	  <bbox x="274" y="310" width="100" height="139" framenr="54" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000053.png" class="2"/>
 	</object>
 	<object nr="7">
 	  <bbox x="362" y="277" width="73" height="188" framenr="22" framefile="/home/viktor/Desktop/actanno/actanno-2/human-notation/bbox_rgb_seg1/bbox000021.png" class="-1"/>

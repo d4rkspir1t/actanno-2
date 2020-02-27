@@ -675,9 +675,8 @@ class AAController:
         if frame_info is None:
             self.insert_ca_frame_label(fnr, object_id, aclass)
 
-
     def del_rect(self, index):
-
+        self.del_ca_frame_single(self.cur_frame_nr, index)
         del self.frames[self.cur_frame_nr].get_rects()[index]
 
     def get_sem_mouse_pos(self, x, y):
