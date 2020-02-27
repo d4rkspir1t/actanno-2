@@ -4,3 +4,4 @@ src/*.pyc
 kcltestimages/
 venv/
 .idea
+human-notation/
