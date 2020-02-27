@@ -469,9 +469,9 @@ class AAController:
 
     # Remove the rectangle with the given index from the list
     # of rectangles of the currently selected frame
-    def delete_rect(self, index):
-        print 'To delete: ', index
-        self.del_ca_frame_single(self.cur_frame_nr, index+1)
+    def delete_rect(self, index, human_id):
+        # print 'To delete: ', index
+        self.del_ca_frame_single(self.cur_frame_nr, human_id)
         del self.frames[self.cur_frame_nr].rects[index]
 
     @staticmethod
@@ -676,7 +676,7 @@ class AAController:
             self.insert_ca_frame_label(fnr, object_id, aclass)
 
     def del_rect(self, index):
-        print 'To delete del_rect: ', index
+        # print 'To delete del_rect: ', index
         self.del_ca_frame_single(self.cur_frame_nr, index+1)
         del self.frames[self.cur_frame_nr].get_rects()[index]
 
@@ -1255,8 +1255,10 @@ class Example(Frame):
     # Remove the currently selected rectangle of the current frame
     def delete_cur_rect(self, event):
         sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
+        object_text = self.object_id_box.get(sempos.index)
+        human_id = object_text.split('[')[1].split(']')[0]
         if sempos.index > -1:
-            self.ct.delete_rect(sempos.index)
+            self.ct.delete_rect(sempos.index, human_id)
             self.display_anno()
             self.display_class_assignations()
             self.canvas.update()
@@ -1419,7 +1421,7 @@ class Example(Frame):
         x = frame_labels
         for idx, key in enumerate(frame_keys):
             if frame_labels[idx] < 0:
-                self.object_id_box.insert(END, str(key) + " has no assigned class ")
+                self.object_id_box.insert(END, "[" + str(key) + "] has no assigned class ")
             else:
                 self.object_id_box.insert(END, "Human [" + str(key) + "] belongs to group [" + str(frame_labels[idx]) + "]")
 
@@ -1427,14 +1429,18 @@ class Example(Frame):
     # a given object
     def object_id_box_click(self, event):
         self.clicked_object_id = self.object_id_box.curselection()
-
-        class_id = tkSimpleDialog.askinteger('Set BBOX ID', 'Enter group ID for chosen person or 0 if they are not in a group')
+        object_text = self.object_id_box.get(self.clicked_object_id)
+        human_id = object_text.split('[')[1].split(']')[0]
+        # print 'selected human_id: ', human_id
+        class_id = tkSimpleDialog.askinteger('Set BBOX ID', 'Enter group ID for person [' + human_id + '] or 0 if they are not in a group')
+        if class_id == None:
+            class_id = -1
         # print str(class_id), ' is the class id for that human.'
 
         object_id = int(self.clicked_object_id[0])
         # print 'objectidboxclick object id ', object_id+1
         # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
-        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, object_id+1, class_id)
+        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
         self.display_class_assignations()
         self.is_modified = True
 
