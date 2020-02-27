@@ -491,6 +491,7 @@ class AAController:
             print "we have", x, "frames"
             if x > 0 and not force:
                 print "No propagation, target frame is not empty"
+                tkMessageBox.showinfo("Warn - No propagation", "Target frame was not empty, go back a frame and try P for individual bbox propagation, or F for override.")
             else:
                 self.frames[self.cur_frame_nr].rects = []
                 y = len(self.frames[self.cur_frame_nr - 1].rects)
@@ -502,6 +503,7 @@ class AAController:
                     values = []
                     for (hum_no, label) in prev_frame_classes:
                         values.append((self.cur_frame_nr, hum_no, label))
+                    self.del_ca_frame_info(self.cur_frame_nr)
                     self.insert_ca_frame_all(values)
                     if trackingLib is None:
                         # simple copy
@@ -561,7 +563,7 @@ class AAController:
         query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%s, %s, %s);"
         cursor.execute(query, fr_info_single)
         db.commit()
-        # print 'ln 563 insert frame single: ', cursor.rowcount, "record inserted"
+        print 'ln 563 insert frame single: ', cursor.rowcount, "record inserted %s %s %s" % (fr_info_single)
 
     def next_frame_prop_current_rect(self, rect_index):
         propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
@@ -669,9 +671,13 @@ class AAController:
             raise Exception()
         self.frames[fnr].get_rects().append(AARect(x1, y1, x2, y2, object_id))
         # print 'addrect object id ', object_id
-        self.insert_ca_frame_label(fnr, object_id, aclass)
+        frame_info = self.select_ca_frame_single(fnr, object_id)
+        if frame_info is None:
+            self.insert_ca_frame_label(fnr, object_id, aclass)
+
 
     def del_rect(self, index):
+
         del self.frames[self.cur_frame_nr].get_rects()[index]
 
     def get_sem_mouse_pos(self, x, y):
@@ -696,10 +702,10 @@ class AAController:
         # print 'useobjectid curframenr ', self.cur_frame_nr
         count = self.count_ca_frame_objects(self.cur_frame_nr)
         neededcap = new_id - count
-        if neededcap > 0:
-            for i in range(neededcap):
-                # print 'useobjectid new_id ', new_id
-                self.insert_ca_frame_label(self.cur_frame_nr-1, new_id, -1)
+        # if neededcap > 0:
+        #     for i in range(neededcap):
+        #         # print 'useobjectid new_id ', new_id
+        #         self.insert_ca_frame_label(self.cur_frame_nr-1, new_id, -1)
 
     def export_xml(self):
         self.export_xml_filename(self.output_filename)
@@ -1413,9 +1419,9 @@ class Example(Frame):
         x = frame_labels
         for idx, key in enumerate(frame_keys):
             if frame_labels[idx] < 0:
-                self.object_id_box.insert(END, str(key + 1) + " has no assigned class ")
+                self.object_id_box.insert(END, str(key) + " has no assigned class ")
             else:
-                self.object_id_box.insert(END, "Human [" + str(key + 1) + "] belongs to group [" + str(frame_labels[idx]) + "]")
+                self.object_id_box.insert(END, "Human [" + str(key) + "] belongs to group [" + str(frame_labels[idx]) + "]")
 
     # a listbox item has been clicked: choose the object class for
     # a given object
@@ -1448,8 +1454,10 @@ class Example(Frame):
                         self.ct.update_ca_frame_single(frame_no, sempos.index+1, prev_frame_info[1])
                     else:
                         self.ct.insert_ca_frame_label(frame_no, sempos.index+1, prev_frame_info[1])
+        tkMessageBox.showinfo("Propagation", "Single label propagated through the set.")
         self.display_anno()
         self.display_class_assignations()
+
         self.is_modified = True
 
     def propagate_all_labels(self, event):
@@ -1468,6 +1476,7 @@ class Example(Frame):
                         self.ct.update_ca_frame_single(frame_no, object_id, prev_frame_info[1])
                     else:
                         self.ct.insert_ca_frame_label(frame_no, object_id, prev_frame_info[1])
+        tkMessageBox.showinfo("Propagation", "All labels in frame propagated through the set.")
         self.display_anno()
         self.display_class_assignations()
         self.is_modified = True
