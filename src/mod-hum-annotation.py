@@ -470,7 +470,7 @@ class AAController:
     # Remove the rectangle with the given index from the list
     # of rectangles of the currently selected frame
     def delete_rect(self, index):
-        # print 'To delete: ', index
+        print 'To delete: ', index
         self.del_ca_frame_single(self.cur_frame_nr, index+1)
         del self.frames[self.cur_frame_nr].rects[index]
 
@@ -676,7 +676,8 @@ class AAController:
             self.insert_ca_frame_label(fnr, object_id, aclass)
 
     def del_rect(self, index):
-        self.del_ca_frame_single(self.cur_frame_nr, index)
+        print 'To delete del_rect: ', index
+        self.del_ca_frame_single(self.cur_frame_nr, index+1)
         del self.frames[self.cur_frame_nr].get_rects()[index]
 
     def get_sem_mouse_pos(self, x, y):
