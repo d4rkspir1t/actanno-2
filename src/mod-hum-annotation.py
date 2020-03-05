@@ -1082,6 +1082,10 @@ class Example(Frame):
             # close tracking library
             if trackingLib is not None:
                 trackingLib.close_lib()
+            try:
+                cursor.execute("DROP TABLE hum_to_group;")
+            except:
+                pass
             self.parent.destroy()
 
     def save_images_with_bbox(self):
