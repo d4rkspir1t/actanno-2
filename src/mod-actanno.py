@@ -18,9 +18,10 @@ import xml.etree.ElementTree as xml
 import matplotlib.image as mpimg
 import numpy as np
 
-from minimal_ctypes_opencv import *
-from config import cfg
-from config import cfg_from_file
+from src.minimal_ctypes_opencv import *
+# from minimal_ctypes_opencv import *
+from src.config import cfg
+from src.config import cfg_from_file
 
 
 def mkdir_p(path):
@@ -134,7 +135,7 @@ class AARect:
 		self.object_id = object_id
 
 	def show(self):
-		print "x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id
+		print("x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id)
 
 
 # ***************************************************************************
@@ -389,7 +390,7 @@ class AAController:
 		elif ext == ".jpg":
 			self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
 		else:
-			print "def curFrame(self): Extension not supported but trying anyway. [", ext, "]"
+			print("def curFrame(self): Extension not supported but trying anyway. [", ext, "]")
 			self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
 		# print "frame nr. ",self.curFrameNr, "=",self.filenames[self.curFrameNr]
 		return self.cur_image
@@ -421,24 +422,24 @@ class AAController:
 		if do_propagate:
 			x = len(self.frames[self.cur_frame_nr].rects)
 
-			print "we have", x, "frames"
+			print("we have", x, "frames")
 			if x > 0 and not force:
-				print "No propagation, target frame is not empty"
+				print("No propagation, target frame is not empty")
 			else:
 				self.frames[self.cur_frame_nr].rects = []
 				y = len(self.frames[self.cur_frame_nr - 1].rects)
 				if y > 0:
 					# Tracking code goes here .....
-					print "Propagating ", y, "rectangle(s) to next frame"
+					print("Propagating ", y, "rectangle(s) to next frame")
 
 					if trackingLib is None:
 						# simple copy
-						print "simple copy"
+						print("simple copy")
 						self.cur_frame()
 						self.frames[self.cur_frame_nr].rects = copy.deepcopy(self.frames[self.cur_frame_nr - 1].rects)
 					else:
 						# JM tracking
-						print "use JM tracking"
+						print("use JM tracking")
 						self.old_frame = self.cur_image
 						self.cur_frame()
 
@@ -460,7 +461,7 @@ class AAController:
 							self.frames[self.cur_frame_nr].rects.append(outrect)
 
 				else:
-					print "No frames to propagate"
+					print("No frames to propagate")
 		else:
 			self.cur_frame()
 		self.export_xml_filename("save.xml")
@@ -484,12 +485,12 @@ class AAController:
 			# get his new position by tracking
 			if trackingLib is None:
 				# simple copy
-				print "simple copy"
+				print("simple copy")
 				self.cur_frame()
 				rect_propagated = copy.deepcopy(rect_to_propagate)
 			else:
 				# JM tracking
-				print "use JM tracking"
+				print("use JM tracking")
 				self.old_frame = self.cur_image
 				self.cur_frame()
 
@@ -516,7 +517,7 @@ class AAController:
 			rect_already_exists = False
 			for i, currentrect in enumerate(self.frames[self.cur_frame_nr].rects):
 				if currentrect.object_id == propagate_id:
-					print "Rectangle found. Updating."
+					print("Rectangle found. Updating.")
 					self.frames[self.cur_frame_nr].rects[i] = copy.deepcopy(rect_propagated)
 					rect_already_exists = True
 					break
@@ -601,10 +602,10 @@ class AAController:
 		except IOError:
 			tkMessageBox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
 										 "Does the directory exist?")
-		print >> fd, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-		print >> fd, "<tagset>"
-		print >> fd, "  <video>"
-		print >> fd, "	<videoName>" + self.video_name + "</videoName>"
+		fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+		fd.write("<tagset>")
+		fd.write("  <video>")
+		fd.write("	<videoName>" + self.video_name + "</videoName>")
 
 		# self.filenames[self.curFrameNr]
 		# Travers all different running id's
@@ -623,13 +624,13 @@ class AAController:
 						s = s + "\" framefile=\"" + self.filenames[i] + "\"/>\n"
 						fd.write(s)
 			if found_rects:
-				print >> fd, "	</object>"
-		print >> fd, "  </video>"
-		print >> fd, "</tagset>"
+				fd.write("	</object>")
+		fd.write("  </video>")
+		fd.write("</tagset>")
 		fd.close()
 
 	def export_xml2voc(self):
-		print "Exporting..."
+		print("Exporting...")
 		mkdir_p(self.voc_path)
 		for (i, f) in enumerate(self.frames):
 			head, tail = os.path.split(self.filenames[i])
@@ -641,37 +642,37 @@ class AAController:
 				tkMessageBox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
 											 "Does the directory exist?")
 
-			print >> fd, "<annotation>"
-			print >> fd, "	<folder>" + self.folder_name + "</folder>"
-			print >> fd, "	<filename>" + tail + "</filename>"
-			print >> fd, "	<source>"
-			print >> fd, "		<database>The " + self.dataset_name + " database</database>"
-			print >> fd, "	</source>"
-			print >> fd, "	<owner>" + self.owner + "</owner>"
-			print >> fd, "	<size>"
-			print >> fd, "		<width>640</width>"
-			print >> fd, "		<height>480</height>"
-			print >> fd, "		<depth>1</depth>"
-			print >> fd, "	</size>"
-			print >> fd, "	<segmented>0</segmented>"
+			fd.write("<annotation>")
+			fd.write("	<folder>" + self.folder_name + "</folder>")
+			fd.write("	<filename>" + tail + "</filename>")
+			fd.write("	<source>")
+			fd.write("		<database>The " + self.dataset_name + " database</database>")
+			fd.write("	</source>")
+			fd.write("	<owner>" + self.owner + "</owner>")
+			fd.write("	<size>")
+			fd.write("		<width>640</width>")
+			fd.write("		<height>480</height>")
+			fd.write("		<depth>1</depth>")
+			fd.write("	</size>")
+			fd.write("	<segmented>0</segmented>")
 
 			for (j, r) in enumerate(f.get_rects()):
-				print >> fd, "	<object>"
-				print >> fd, "		<name>" + classnames[self.class_assignations[r.object_id - 1]] + "</name>"
-				print >> fd, "		<pose>unknown</pose>"
-				print >> fd, "		<truncated>-1</truncated>"
-				print >> fd, "		<difficult>0</difficult>"
-				print >> fd, "		<bndbox>"
-				print >> fd, "			<xmin>" + str(int(r.x1)) + "</xmin>"
-				print >> fd, "			<ymin>" + str(int(r.y1)) + "</ymin>"
-				print >> fd, "			<xmax>" + str(int(r.x2)) + "</xmax>"
-				print >> fd, "			<ymax>" + str(int(r.y2)) + "</ymax>"
-				print >> fd, "		</bndbox>"
-				print >> fd, "	</object>"
+				fd.write("	<object>")
+				fd.write("		<name>" + classnames[self.class_assignations[r.object_id - 1]] + "</name>")
+				fd.write("		<pose>unknown</pose>")
+				fd.write("		<truncated>-1</truncated>")
+				fd.write("		<difficult>0</difficult>")
+				fd.write("		<bndbox>")
+				fd.write("			<xmin>" + str(int(r.x1)) + "</xmin>")
+				fd.write("			<ymin>" + str(int(r.y1)) + "</ymin>")
+				fd.write("			<xmax>" + str(int(r.x2)) + "</xmax>")
+				fd.write("			<ymax>" + str(int(r.y2)) + "</ymax>")
+				fd.write("		</bndbox>")
+				fd.write("	</object>")
 
-			print >> fd, "</annotation>"
+			fd.write("</annotation>")
 			fd.close()
-		print "Done !"
+		print("Done !")
 
 	def parse_xml(self):
 		tree = xml.parse(self.output_filename)
@@ -727,10 +728,10 @@ class AAController:
 				try:
 					self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1)
 				except IndexError:
-					print "*** ERROR ***"
-					print "The XML file contains rectangles in frame numbers which are outside of the video"
-					print "(frame number too large). Please check whether the XML file really fits to these"
-					print "frames."
+					print("*** ERROR ***")
+					print("The XML file contains rectangles in frame numbers which are outside of the video")
+					print("(frame number too large). Please check whether the XML file really fits to these")
+					print("frames.")
 					sys.exit(1)
 
 
@@ -1296,7 +1297,7 @@ def main():
 		# print "JM tracking library loaded."
 		trackingLib.init_lib()
 	else:
-		print "Failed to load JM tracking library."
+		print("Failed to load JM tracking library.")
 	# print trackingLib
 
 	root = Tk()

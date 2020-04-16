@@ -18,9 +18,9 @@ import xml.etree.ElementTree as xml
 import matplotlib.image as mpimg
 import numpy as np
 
-from minimal_ctypes_opencv import *
-from config import cfg
-from config import cfg_from_file
+from src.minimal_ctypes_opencv import *
+from src.config import cfg
+from src.config import cfg_from_file
 
 import mysql.connector as mysql
 
@@ -109,7 +109,7 @@ except:
 cursor.execute(
     "CREATE TABLE hum_to_group (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, frame_no INT(11), human_id INT(11), label INT(11));")
 cursor.execute("DESC hum_to_group;")
-print cursor.fetchall()
+print(cursor.fetchall())
 
 
 def get_single_tag(tree, tagname):
@@ -151,7 +151,7 @@ class AARect:
         self.object_id = object_id
 
     def show(self):
-        print "x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id
+        print("x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id)
 
 
 # ***************************************************************************
@@ -416,7 +416,7 @@ class AAController:
         elif ext == ".jpg":
             self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
         else:
-            print "def curFrame(self): Extension not supported but trying anyway. [", ext, "]"
+            print("def curFrame(self): Extension not supported but trying anyway. [", ext, "]")
             self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
         # print "frame nr. ",self.curFrameNr, "=",self.filenames[self.curFrameNr]
         return self.cur_image
@@ -488,16 +488,16 @@ class AAController:
         # propagate the previous ones
         if do_propagate:
             x = len(self.frames[self.cur_frame_nr].rects)
-            print "we have", x, "frames"
+            print("we have", x, "frames")
             if x > 0 and not force:
-                print "No propagation, target frame is not empty"
+                print("No propagation, target frame is not empty")
                 tkMessageBox.showinfo("Warn - No propagation", "Target frame was not empty, go back a frame and try P for individual bbox propagation, or F for override.")
             else:
                 self.frames[self.cur_frame_nr].rects = []
                 y = len(self.frames[self.cur_frame_nr - 1].rects)
                 if y > 0:
                     # Tracking code goes here .....
-                    print "Propagating ", y, "rectangle(s) to next frame"
+                    print("Propagating ", y, "rectangle(s) to next frame")
                     frame_info = self.select_ca_frame_info(self.cur_frame_nr-1)
                     prev_frame_classes = frame_info
                     values = []
@@ -507,12 +507,12 @@ class AAController:
                     self.insert_ca_frame_all(values)
                     if trackingLib is None:
                         # simple copy
-                        print "simple copy"
+                        print("simple copy")
                         self.cur_frame()
                         self.frames[self.cur_frame_nr].rects = copy.deepcopy(self.frames[self.cur_frame_nr - 1].rects)
                     else:
                         # JM tracking
-                        print "use JM tracking"
+                        print("use JM tracking")
                         self.old_frame = self.cur_image
                         self.cur_frame()
 
@@ -534,7 +534,7 @@ class AAController:
                             self.frames[self.cur_frame_nr].rects.append(outrect)
 
                 else:
-                    print "No frames to propagate"
+                    print("No frames to propagate")
         else:
             self.cur_frame()
         # self.export_xml_filename("save.xml")
@@ -563,15 +563,15 @@ class AAController:
         query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%s, %s, %s);"
         cursor.execute(query, fr_info_single)
         db.commit()
-        print 'ln 563 insert frame single: ', cursor.rowcount, "record inserted %s %s %s" % (fr_info_single)
+        print('ln 563 insert frame single: ', cursor.rowcount, "record inserted %s %s %s" % (fr_info_single))
 
     def next_frame_prop_current_rect(self, rect_index):
         propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
-        print "Rect[", rect_index, "].object_id == ", propagate_id
+        print("Rect[", rect_index, "].object_id == ", propagate_id)
 
         if self.cur_frame_nr < len(self.filenames) - 1:
             self.cur_frame_nr += 1
-            print "Propagating rectangle", propagate_id, " to new frame"
+            print("Propagating rectangle", propagate_id, " to new frame")
             x = len(self.frames[self.cur_frame_nr].rects)
             y = len(self.frames[self.cur_frame_nr - 1].rects)
 
@@ -581,8 +581,8 @@ class AAController:
                 self.update_ca_frame_single(self.cur_frame_nr, propagate_id, prev_frame_info[1])
             else:
                 self.insert_ca_frame_label(self.cur_frame_nr, propagate_id, prev_frame_info[1])
-            print "we have ", x, " objects"
-            print "we had  ", y, " objects"
+            print("we have ", x, " objects")
+            print("we had  ", y, " objects")
 
             # get old rect to propagate
             rect_to_propagate = self.frames[self.cur_frame_nr - 1].rects[rect_index]
@@ -590,12 +590,12 @@ class AAController:
             # get his new position by tracking
             if trackingLib is None:
                 # simple copy
-                print "simple copy"
+                print("simple copy")
                 self.cur_frame()
                 rect_propagated = copy.deepcopy(rect_to_propagate)
             else:
                 # JM tracking
-                print "use JM tracking"
+                print("use JM tracking")
                 self.old_frame = self.cur_image
                 self.cur_frame()
 
@@ -622,7 +622,7 @@ class AAController:
             rect_already_exists = False
             for i, currentrect in enumerate(self.frames[self.cur_frame_nr].rects):
                 if currentrect.object_id == propagate_id:
-                    print "Rectangle found. Updating."
+                    print("Rectangle found. Updating.")
                     self.frames[self.cur_frame_nr].rects[i] = copy.deepcopy(rect_propagated)
                     rect_already_exists = True
                     break
@@ -731,10 +731,10 @@ class AAController:
         except IOError:
             tkMessageBox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
                                          "Does the directory exist?")
-        print >> fd, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        print >> fd, "<tagset>"
-        print >> fd, "  <video>"
-        print >> fd, "	<videoName>" + self.video_name + "</videoName>"
+        fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+        fd.write("<tagset>")
+        fd.write("  <video>")
+        fd.write("	<videoName>" + self.video_name + "</videoName>")
 
         # self.filenames[self.curFrameNr]
         # Travers all different running id's
@@ -749,7 +749,7 @@ class AAController:
                 human_id = info[0]
                 human_label = info[1]
                 mysql_dict[frame_id][human_id] = human_label
-        print 'MySQL read, converted to dict on SAVE'
+        print('MySQL read, converted to dict on SAVE')
 
         for cur_object_id in range(maxid):
             found_rects = False
@@ -769,13 +769,13 @@ class AAController:
                         s = s + "\" class=\"" + str(obj_class) + "\"/>\n"
                         fd.write(s)
             if found_rects:
-                print >> fd, "	</object>"
-        print >> fd, "  </video>"
-        print >> fd, "</tagset>"
+                fd.write("	</object>")
+        fd.write("  </video>")
+        fd.write("</tagset>")
         fd.close()
 
     def export_xml2voc(self):
-        print "Exporting..."
+        print("Exporting...")
         mkdir_p(self.voc_path)
         for (i, f) in enumerate(self.frames):
             head, tail = os.path.split(self.filenames[i])
@@ -787,39 +787,39 @@ class AAController:
                 tkMessageBox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
                                              "Does the directory exist?")
 
-            print >> fd, "<annotation>"
-            print >> fd, "	<folder>" + self.folder_name + "</folder>"
-            print >> fd, "	<filename>" + tail + "</filename>"
-            print >> fd, "	<source>"
-            print >> fd, "		<database>The " + self.dataset_name + " database</database>"
-            print >> fd, "	</source>"
-            print >> fd, "	<owner>" + self.owner + "</owner>"
-            print >> fd, "	<size>"
-            print >> fd, "		<width>640</width>"
-            print >> fd, "		<height>480</height>"
-            print >> fd, "		<depth>1</depth>"
-            print >> fd, "	</size>"
-            print >> fd, "	<segmented>0</segmented>"
+            fd.write("<annotation>")
+            fd.write("	<folder>" + self.folder_name + "</folder>")
+            fd.write("	<filename>" + tail + "</filename>")
+            fd.write("	<source>")
+            fd.write("		<database>The " + self.dataset_name + " database</database>")
+            fd.write("	</source>")
+            fd.write("	<owner>" + self.owner + "</owner>")
+            fd.write("	<size>")
+            fd.write("		<width>640</width>")
+            fd.write("		<height>480</height>")
+            fd.write("		<depth>1</depth>")
+            fd.write("	</size>")
+            fd.write("	<segmented>0</segmented>")
 
             for (j, r) in enumerate(f.get_rects()):
                 frame_info = self.select_ca_frame_single(i, r.object_id)
                 label = frame_info[1]
-                print >> fd, "	<object>"
-                print >> fd, "		<name>" + str(label) + "</name>"
-                print >> fd, "		<pose>unknown</pose>"
-                print >> fd, "		<truncated>-1</truncated>"
-                print >> fd, "		<difficult>0</difficult>"
-                print >> fd, "		<bndbox>"
-                print >> fd, "			<xmin>" + str(int(r.x1)) + "</xmin>"
-                print >> fd, "			<ymin>" + str(int(r.y1)) + "</ymin>"
-                print >> fd, "			<xmax>" + str(int(r.x2)) + "</xmax>"
-                print >> fd, "			<ymax>" + str(int(r.y2)) + "</ymax>"
-                print >> fd, "		</bndbox>"
-                print >> fd, "	</object>"
+                fd.write("	<object>")
+                fd.write("		<name>" + str(label) + "</name>")
+                fd.write("		<pose>unknown</pose>")
+                fd.write("		<truncated>-1</truncated>")
+                fd.write("		<difficult>0</difficult>")
+                fd.write("		<bndbox>")
+                fd.write("			<xmin>" + str(int(r.x1)) + "</xmin>")
+                fd.write("			<ymin>" + str(int(r.y1)) + "</ymin>")
+                fd.write("			<xmax>" + str(int(r.x2)) + "</xmax>")
+                fd.write("			<ymax>" + str(int(r.y2)) + "</ymax>")
+                fd.write("		</bndbox>")
+                fd.write("	</object>")
 
-            print >> fd, "</annotation>"
+            fd.write("</annotation>")
             fd.close()
-        print "Done !"
+        print("Done !")
         tkMessageBox.showinfo("VOC export", "File(s) saved successfully!")
 
     @staticmethod
@@ -875,10 +875,10 @@ class AAController:
                 try:
                     self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, aclass)
                 except IndexError:
-                    print "*** ERROR ***"
-                    print "The XML file contains rectangles in frame numbers which are outside of the video"
-                    print "(frame number too large). Please check whether the XML file really fits to these"
-                    print "frames."
+                    print("*** ERROR ***")
+                    print("The XML file contains rectangles in frame numbers which are outside of the video")
+                    print("(frame number too large). Please check whether the XML file really fits to these")
+                    print("frames.")
                     sys.exit(1)
 
     def load_human_tracked_xml(self):
@@ -920,10 +920,10 @@ class AAController:
                 try:
                     self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, -1)
                 except IndexError:
-                    print "*** ERROR ***"
-                    print "The XML file contains rectangles in frame numbers which are outside of the video"
-                    print "(frame number too large). Please check whether the XML file really fits to these"
-                    print "frames."
+                    print("*** ERROR ***")
+                    print("The XML file contains rectangles in frame numbers which are outside of the video")
+                    print("(frame number too large). Please check whether the XML file really fits to these")
+                    print("frames.")
                     sys.exit(1)
 
 
@@ -1518,7 +1518,7 @@ def main():
 
     config_path = sys.argv[1]
     cfg_file = os.path.join(config_path, 'config.yml')
-    print "Loading config from >%s<" % cfg_file
+    print("Loading config from >%s<" % cfg_file)
     cfg_from_file(cfg_file)
     folder_path = sys.argv[2]
     cfg.MAIN_DIR = folder_path
@@ -1526,8 +1526,8 @@ def main():
     from os.path import normpath, basename
     cfg.FOLDER_NAME = basename(normpath(folder_path))
     cfg.MAIN_DIR = folder_path
-    print "Configuration :"
-    print cfg
+    print("Configuration :")
+    print(cfg)
     classnames = cfg.CLASSES
 
     # load C++ JM tracking library
@@ -1547,8 +1547,8 @@ def main():
         # print "JM tracking library loaded."
         trackingLib.init_lib()
     else:
-        print "Failed to load JM tracking library."
-    print trackingLib
+        print("Failed to load JM tracking library.")
+    print(trackingLib)
 
     root = Tk()
     root.protocol("WM_DELETE_WINDOW", onexit)
