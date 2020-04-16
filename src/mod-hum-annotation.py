@@ -948,7 +948,7 @@ class Example(Frame):
         self.cur_path = cur_path
         self.ct = AAController()
         font_path = os.path.dirname(os.path.realpath(__file__))
-        self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 30)
+        self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 25)
         self.init_ui()
         self.event_counter = 0
 
@@ -1023,6 +1023,7 @@ class Example(Frame):
         self.canvas.bind("D", self.delete_all_rects)
         self.canvas.bind("l", self.propagate_all_labels)
         self.canvas.bind("o", self.propagate_label)
+        self.canvas.bind("<Tab>", self.label_cur_rect)
         self.object_id_box.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.canvas.bind("<Key-space>", self.next_frame_w_rop)  # the space key
         self.object_id_box.bind("<<ListboxSelect>>", self.object_id_box_click)
@@ -1270,6 +1271,28 @@ class Example(Frame):
                 self.save_images_with_bbox()
         self.is_modified = True
 
+    def label_cur_rect(self, event):
+        sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
+        object_text = self.object_id_box.get(sempos.index)
+        human_id = object_text.split('[')[1].split(']')[0]
+
+        class_id = tkSimpleDialog.askinteger('Set BBOX ID',
+                                             'Enter group ID for person [' + human_id + '] or 0 if they are not in a group')
+        if class_id == None:
+            class_id = -1
+        # print str(class_id), ' is the class id for that human.'
+
+        # object_id = int(self.clicked_object_id[0])
+        # print 'objectidboxclick object id ', object_id+1
+        # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
+        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
+        self.display_anno()
+        self.display_class_assignations()
+        self.canvas.update()
+        if cfg.BBOX_PREFIX != 'default':
+            self.save_images_with_bbox()
+        self.is_modified = True
+
     def left_mouse_down(self, event):
         # On a Mac the right click does not work, at least not expected
         # workaround: if the CTRL key is held with a left click, we consider
@@ -1394,7 +1417,17 @@ class Example(Frame):
                 curcol = "red"
             draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
             draw.rectangle([r.x1 + 1, r.y1 + 1, r.x2 - 1, r.y2 - 1], outline=curcol)
-            draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)
+
+            frame_info = self.ct.select_ca_frame_info(self.ct.cur_frame_nr)
+            frame_keys = [info[0] for info in frame_info]
+            frame_labels = [info[1] for info in frame_info]
+            x = frame_labels
+            label = 0
+            for idx, key in enumerate(frame_keys):
+                if key == r.object_id:
+                    label = x[idx]
+                    break
+            draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id)+' - '+str(label), font=self.img_font, fill=curcol)
 
             # Draw the icons
             if i == sempos.index:
@@ -1424,10 +1457,10 @@ class Example(Frame):
         frame_labels = [info[1] for info in frame_info]
         x = frame_labels
         for idx, key in enumerate(frame_keys):
-            if frame_labels[idx] < 0:
+            if x[idx] < 0:
                 self.object_id_box.insert(END, "[" + str(key) + "] has no assigned class ")
             else:
-                self.object_id_box.insert(END, "Human [" + str(key) + "] belongs to group [" + str(frame_labels[idx]) + "]")
+                self.object_id_box.insert(END, "Human [" + str(key) + "] belongs to group [" + str(x[idx]) + "]")
 
     # a listbox item has been clicked: choose the object class for
     # a given object
