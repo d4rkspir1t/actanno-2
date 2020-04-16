@@ -22,6 +22,8 @@ from src.minimal_ctypes_opencv import *
 # from minimal_ctypes_opencv import *
 from src.config import cfg
 from src.config import cfg_from_file
+import src.supporting_files.rectangle_manager as rect_mngr
+import src.supporting_files.semantic_mouse_position_manager as smp_mngr
 
 
 def mkdir_p(path):
@@ -81,27 +83,7 @@ bindings = "\
 		--------------------------------------------------------\n \
 		Deletion : \n \
 			d : delete rectangle with focus \n \
-			D : delete all rectangles \n \
-		--------------------------------------------------------\n \
-		Select objects : \n \
-			1 : choseobjectId1 \n \
-			2 : choseobjectId2 \n \
-			3 : choseobjectId3 \n \
-			4 : choseobjectId4 \n \
-			5 : choseobjectId5 \n \
-			6 : choseobjectId6 \n \
-			7 : choseobjectId7 \n \
-			8 : choseobjectId8 \n \
-			9 : choseobjectId9 \n \
-			0 : choseobjectId10 \n"
-
-
-def get_single_tag(tree, tagname):
-	rv = tree.findall(tagname)
-	if len(rv) != 1:
-		tkMessageBox.showinfo(TITLE, "tag " + tagname + " needs to occur a single time at this point!")
-		sys.exit(1)
-	return rv[0]
+			D : delete all rectangles"
 
 
 # Return an attribute value. Check for its existence
@@ -111,69 +93,6 @@ def get_att(node, attname):
 		tkMessageBox.showinfo(TITLE, "attribute " + attname + " not found in tag " + node.tag)
 		sys.exit(1)
 	return rv
-
-
-# ***************************************************************************
-
-
-class AARect:
-	"""A rectangle (bounding box) and its running id"""
-
-	def __init__(self, x1, y1, x2, y2, object_id):
-		if x1 < x2:
-			self.x1 = x1
-			self.x2 = x2
-		else:
-			self.x1 = x2
-			self.x2 = x1
-		if y1 < y2:
-			self.y1 = y1
-			self.y2 = y2
-		else:
-			self.y1 = y2
-			self.y2 = y1
-		self.object_id = object_id
-
-	def show(self):
-		print("x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id)
-
-
-# ***************************************************************************
-# C type matching Python type
-class c_AARect(ctypes.Structure):
-	_fields_ = [("x1", ctypes.c_int), ("y1", ctypes.c_int), ("x2", ctypes.c_int), ("y2", ctypes.c_int), ("objectId", ctypes.c_int)]
-
-
-# ***************************************************************************
-# convert AARect to c_AARect
-def to_c_aa_rect(r):
-	return c_AARect(x1=int(r.x1), y1=int(r.y1), x2=int(r.x2), y2=int(r.y2), objectId=int(r.object_id))
-
-
-# ***************************************************************************
-# convert c_AARect to AARect
-def to_aa_rect(c_r):
-	return AARect(c_r.x1, c_r.y1, c_r.x2, c_r.y2, c_r.objectId)
-
-
-# ***************************************************************************
-class SemMousePos:
-	"""A semantic mouse position: in which rectangle (index) is the mouse
-	and which semantic position does it occupy. sempose can be:
-	ul	upper left corner
-	ur	upper right corner
-	ll	lower left corner
-	lr	lower right corner
-	c	center
-	g	general position in the recangle
-	n	no rectangles"""
-
-	def __init__(self, index, sem_pos):
-		self.index = index
-		self.sem_pos = sem_pos
-
-
-# ***************************************************************************
 
 
 class AAFrame:
@@ -218,7 +137,7 @@ class AAFrame:
 
 		# We are near enough to a corner, we are done
 		if min_val < CORNER_DIST_THR * CORNER_DIST_THR:
-			return SemMousePos(arg_idx, arg_sem)
+			return smp_mngr.SemMousePos(arg_idx, arg_sem)
 
 		# Now check for the nearest center
 		min_val = 99999999
@@ -232,12 +151,12 @@ class AAFrame:
 				arg_idx = i
 
 		if arg_idx < 0:
-			return SemMousePos(-1, "n")
+			return smp_mngr.SemMousePos(-1, "n")
 
 		if min_val < CENTER_DIST_THR * CENTER_DIST_THR:
-			return SemMousePos(arg_idx, "c")
+			return smp_mngr.SemMousePos(arg_idx, "c")
 		else:
-			return SemMousePos(arg_idx, "g")
+			return smp_mngr.SemMousePos(arg_idx, "g")
 
 
 # ***************************************************************************
@@ -274,7 +193,7 @@ class AAController:
 		prefix = cfg.MAIN_DIR + cfg.RGB_PREFIX
 		self.filenames = sorted(glob.glob(prefix + "*"))
 		if len(self.filenames) < 1:
-			print >> sys.stderr, "Did not find any rgb frames! Is the prefix correct? Prefix: ", prefix
+			sys.stderr.write("Did not find any rgb frames! Is the prefix correct? Prefix: ", prefix)
 			self.usage()
 		for i in range(len(self.filenames)):
 			self.frames.append(AAFrame())
@@ -286,7 +205,7 @@ class AAController:
 			prefix_depth = cfg.MAIN_DIR + cfg.D_PREFIX
 			self.filenames_depth = sorted(glob.glob(prefix_depth + "*"))
 			if len(self.filenames_depth) < 1:
-				print >> sys.stderr, "Did not find any depths frames! Is the prefix correct?"
+				sys.stderr.write("Did not find any depths frames! Is the prefix correct?")
 				self.usage()
 
 			self.array_rgb2depth_ts = np.zeros(len(self.filenames), dtype=np.int)
@@ -450,14 +369,14 @@ class AAController:
 							# No need to invoke cvRelease...()
 
 							# convert Python types to C types
-							c_inrect = to_c_aa_rect(inrect)
-							c_outrect = c_AARect()
+							c_inrect = rect_mngr.to_c_aa_rect(inrect)
+							c_outrect = rect_mngr.c_AARect()
 
 							# call C++ tracking lib
 							trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),ctypes.byref(c_inrect), ctypes.byref(c_outrect))
 
 							# convert C types to Python types
-							outrect = to_aa_rect(c_outrect)
+							outrect = rect_mngr.to_aa_rect(c_outrect)
 							self.frames[self.cur_frame_nr].rects.append(outrect)
 
 				else:
@@ -500,15 +419,15 @@ class AAController:
 				# No need to invoke cvRelease...()
 
 				# convert Python types to C types
-				c_inrect = to_c_aa_rect(rect_to_propagate)
-				c_outrect = c_AARect()
+				c_inrect = rect_mngr.to_c_aa_rect(rect_to_propagate)
+				c_outrect = rect_mngr.c_AARect()
 
 				# call C++ tracking lib
 				trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
 												 ctypes.byref(c_inrect), ctypes.byref(c_outrect))
 
 				# convert C types to Python types
-				rect_propagated = to_aa_rect(c_outrect)
+				rect_propagated = rect_mngr.to_aa_rect(c_outrect)
 			# self.frames[self.curFrameNr].rects.append(outrect)
 
 			rect_propagated.object_id = propagate_id
@@ -564,7 +483,7 @@ class AAController:
 			fnr = self.cur_frame_nr
 		if fnr >= len(self.frames):
 			raise Exception()
-		self.frames[fnr].get_rects().append(AARect(x1, y1, x2, y2, object_id))
+		self.frames[fnr].get_rects().append(rect_mngr.AARect(x1, y1, x2, y2, object_id))
 
 	def del_rect(self, index):
 		del self.frames[self.cur_frame_nr].get_rects()[index]
@@ -1094,7 +1013,7 @@ class Example(Frame):
 			self.curx2 = -1
 			self.cury2 = -1
 
-		self.cur_sem_pos = SemMousePos(-1, "g")
+		self.cur_sem_pos = smp_mngr.SemMousePos(-1, "g")
 
 	def left_mouse_up(self, event):
 		# self.debugEvent('leftMouseUp')
