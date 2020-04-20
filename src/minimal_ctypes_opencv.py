@@ -128,16 +128,16 @@ IplImage._fields_ = [("nSize", ctypes.c_int),
         ("BorderConst", ctypes.c_int * 4),
         ("imageDataOrigin", c_int8_p)]
 
-#
+
 def detect_opencv():
     def find_lib(name):
         z = ctypes.util.find_library(name)
-        print "using library ", z #EL+
+        print("using library ", z) #EL+
         if z is None:
             raise ImportError("OpenCV's shared library '%s' is not found. Make sure you have its path included in your PATH variable." % name)
         return z
         
-    print "your os:",os.name, platform.system()
+    print("your os:",os.name, platform.system())
         
     if os.name == 'posix':
     

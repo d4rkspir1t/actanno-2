@@ -1,4 +1,4 @@
-from src.minimal_ctypes_opencv import *
+from minimal_ctypes_opencv import *
 
 
 class AARect:
