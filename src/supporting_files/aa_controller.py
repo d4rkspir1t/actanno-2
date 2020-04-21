@@ -5,6 +5,7 @@ import copy
 import os
 import matplotlib.image as mpimg
 import xml.etree.ElementTree as xml
+from pprint import pprint
 
 from PIL import Image
 
@@ -88,7 +89,7 @@ class AAController:
 
 		# if depth
 		if cfg.D_PREFIX != "default":
-			print("USING RGB AND DEPTH")
+			# print("USING RGB AND DEPTH")
 			self.depth_available = True
 			prefix_depth = cfg.MAIN_DIR + cfg.D_PREFIX
 			self.filenames_depth = sorted(glob.glob(prefix_depth + "*"))
@@ -111,7 +112,7 @@ class AAController:
 						id_img_depth_closest = id_img_depth
 				self.array_rgb2depth_ts[id_img_rgb] = id_img_depth_closest
 		else:
-			print("USING RGB ONLY")
+			# print("USING RGB ONLY")
 			self.depth_available = False
 
 		self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
@@ -175,30 +176,19 @@ class AAController:
 			name, ext = os.path.splitext(self.filenames_depth[self.array_rgb2depth_ts[self.cur_frame_nr]])
 			path = self.filenames_depth[self.array_rgb2depth_ts[self.cur_frame_nr]]
 		else:
-			# print "using rgb images"
 			name, ext = os.path.splitext(self.filenames[self.cur_frame_nr])
 			path = self.filenames[self.cur_frame_nr]
-		# print name
 		if ext == ".png":
-			# png = Image.open(self.filenames[self.curFrameNr])#.convert('L')
 			img_matplotlib = mpimg.imread(path)
 			value_max = np.amax(img_matplotlib)
 			scale = 254. / value_max
 			png = Image.fromarray(np.uint8(img_matplotlib * scale))
-			# print(40*"-")
-			# print "format :",png.format
-			# print "size :", png.size
-			# print "mode :", png.mode
-			# png.load()
-			# data = list(png.getdata())
-			# print "max(data)", max(data),"min(data)", min(data)
 			self.cur_image = png.convert('RGB')
 		elif ext == ".jpg":
 			self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
 		else:
 			print("def curFrame(self): Extension not supported but trying anyway. [", ext, "]")
 			self.cur_image = Image.open(self.filenames[self.cur_frame_nr])
-		# print "frame nr. ",self.curFrameNr, "=",self.filenames[self.curFrameNr]
 		return self.cur_image
 
 	def set_aid(self):
@@ -228,11 +218,11 @@ class AAController:
 		if do_propagate:
 			x = len(self.frames[self.cur_frame_nr].rects)
 
-			print("we have", x, "frames")
+			# print("we have", x, "frames")
 			if x > 0 and not force:
 				print("No propagation, target frame is not empty")
 			else:
-				self.frames[self.cur_frame_nr].rects = []
+				self.frames[self.cur_frame_nr] = aaf.AAFrame()
 				y = len(self.frames[self.cur_frame_nr - 1].rects)
 				if y > 0:
 					# Tracking code goes here .....
@@ -248,7 +238,6 @@ class AAController:
 						print("use JM tracking")
 						self.old_frame = self.cur_image
 						self.cur_frame()
-
 						for inrect in self.frames[self.cur_frame_nr - 1].rects:
 							# convert PIL image to OpenCV image
 							cv_old_img = cvCreateImageFromPilImage(self.old_frame)
@@ -270,20 +259,16 @@ class AAController:
 					print("No frames to propagate")
 		else:
 			self.cur_frame()
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_image
 
 	def next_frame_prop_current_rect(self, rect_index):
 		propagate_id = self.frames[self.cur_frame_nr].rects[rect_index].object_id
-		# print "Rect[", rect_index, "].object_id == ", propagate_id
 
 		if self.cur_frame_nr < len(self.filenames) - 1:
 			self.cur_frame_nr += 1
-			# print "Propagating rectangle", propagate_id, " to new frame"
 			x = len(self.frames[self.cur_frame_nr].rects)
 			y = len(self.frames[self.cur_frame_nr - 1].rects)
-			# print "we have ", x, " objects"
-			# print "we had  ", y, " objects"
 
 			# get old rect to propagate
 			rect_to_propagate = self.frames[self.cur_frame_nr - 1].rects[rect_index]
@@ -332,12 +317,12 @@ class AAController:
 				self.frames[self.cur_frame_nr].rects.append(rect_propagated)
 
 		# self.curFrame()
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_image
 
 	def change_frame(self, id_frame):
 		self.cur_frame_nr = int(id_frame) - 1
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_frame()
 
 	def next_frame_far(self):
@@ -345,13 +330,13 @@ class AAController:
 			self.cur_frame_nr += JUMP_FRAMES
 		else:
 			self.cur_frame_nr = len(self.filenames) - 1
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_frame()
 
 	def prev_frame(self):
 		if self.cur_frame_nr > 0:
 			self.cur_frame_nr -= 1
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_frame()
 
 	def prev_frame_far(self):
@@ -359,7 +344,7 @@ class AAController:
 			self.cur_frame_nr -= JUMP_FRAMES
 		else:
 			self.cur_frame_nr = 0
-		self.export_xml_filename("save.xml")
+		# self.export_xml_filename("save.xml")
 		return self.cur_frame()
 
 	def get_rects(self):
@@ -408,10 +393,10 @@ class AAController:
 		except IOError:
 			messagebox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
 										 "Does the directory exist?")
-		fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-		fd.write("<tagset>")
-		fd.write("  <video>")
-		fd.write("	<videoName>" + self.video_name + "</videoName>")
+		fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+		fd.write("<tagset>\n")
+		fd.write("  <video>\n")
+		fd.write("	<videoName>" + self.video_name + "</videoName>\n")
 
 		# self.filenames[self.curFrameNr]
 		# Travers all different running id's
@@ -427,12 +412,13 @@ class AAController:
 						framenr = int(self.filenames[i].split('bbox')[-1].split('.')[0])
 						s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
 						s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
-						s = s + "\" framenr=\"" + str(framenr + 1)
+						s = s + "\" framenr=\"" + str(framenr)
+						s = s + "\" batch-framenr=\"" + str(i)
 						s = s + "\" framefile=\"" + self.filenames[i] + "\"/>\n"
 						fd.write(s)
 			if found_rects:
-				fd.write("	</object>")
-		fd.write("  </video>")
+				fd.write("	</object>\n")
+		fd.write("  </video>\n")
 		fd.write("</tagset>")
 		fd.close()
 
@@ -495,14 +481,6 @@ class AAController:
 			sys.exit(1)
 		vid = vids[0]
 
-		# Get the video name
-		# x=getSingleTag(vid,"videoName")
-		# if (x.text is None) or (len(x.text)==0) or (x.text=="NO-NAME"):
-		#	tkMessageBox.showinfo(TITLE, "The video name in the given XML file is empty. Please provide the correct name before saving the file.")
-		#	self.videoname="NO-NAME"
-		# else:
-		#	self.videoname=x.text
-
 		# Get all the objects
 		objectnodes = vid.findall("object")
 		if len(objectnodes) < 1:
@@ -511,13 +489,9 @@ class AAController:
 			# Add the classnr to the object_id array. Grow if necessary
 			anr = int(get_att(a, "nr"))
 			aclass = int(get_att(a, "class"))
-			# print "-----",anr,aclass
-			# print len(self.ClassAssignations)
 			if len(self.class_assignations) < anr:
-				# print "Growing object_id:"
 				self.class_assignations += [None] * (anr - len(self.class_assignations))
 			self.class_assignations[anr - 1] = aclass
-			# print "size of object_id array:", len(self.ClassAssignations), "array:", self.ClassAssignations
 
 			# Get all the bounding boxes for this object
 			bbs = a.findall("bbox")
@@ -527,7 +501,7 @@ class AAController:
 			for bb in bbs:
 
 				# Add the bounding box to the frames() list
-				bfnr = int(get_att(bb, "framenr"))
+				bfnr = int(get_att(bb, "batch-framenr"))
 				bx = int(get_att(bb, "x"))
 				by = int(get_att(bb, "y"))
 				bw = int(get_att(bb, "width"))

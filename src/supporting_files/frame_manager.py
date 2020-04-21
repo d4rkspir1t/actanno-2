@@ -150,8 +150,7 @@ class FrameManager(Frame):
 		if self.is_modified:
 			if messagebox.askyesno(title='Unsaved changes', message='The annotation has been modified. '
 																	  'Do you really want to quit?'):
-				messagebox.showinfo("First help", "A backup of the latest changes can be found "
-													"in save.xml, just in case.")
+				pass
 			else:
 				ok = False
 		if ok:
@@ -498,7 +497,6 @@ class FrameManager(Frame):
 	def display_class_assignations(self):
 		self.object_id_box.delete(0, END)
 		x = self.ct.class_assignations
-		print('class_assignations\n', x, '\n----')
 		for i in range(len(x)):
 			if x[i] < 0:
 				self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
