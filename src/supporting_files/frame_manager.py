@@ -25,17 +25,17 @@ JUMP_FRAMES = 25
 TITLE = "Actanno V3.0"
 
 trackingLib = None
-classnames = ["null"]
 
 
 class FrameManager(Frame):
-	def __init__(self, parent, cur_path, t_lib):
+	def __init__(self, parent, cur_path, t_lib, classnames):
 		global trackingLib
 		trackingLib = t_lib
+		self.classnames_obj = classnames
 		Frame.__init__(self, parent)
 		self.parent = parent
 		self.cur_path = cur_path
-		self.ct = aac.AAController(trackingLib)
+		self.ct = aac.AAController(trackingLib, self.classnames_obj)
 		font_path = os.path.dirname(os.path.realpath(__file__))
 		self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 30)
 		self.init_ui()
@@ -498,22 +498,23 @@ class FrameManager(Frame):
 	def display_class_assignations(self):
 		self.object_id_box.delete(0, END)
 		x = self.ct.class_assignations
+		print('class_assignations\n', x, '\n----')
 		for i in range(len(x)):
 			if x[i] < 0:
 				self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
 			else:
-				self.object_id_box.insert(END, str(i + 1) + " has class " + str(x[i]) + " [" + classnames[x[i]] + "]")
+				self.object_id_box.insert(END, str(i + 1) + " has class " + str(x[i]) + " [" + self.classnames_obj.name_list[x[i]] + "]")
 
 	# a listbox item has been clicked: choose the object class for
 	# a given object
 	def object_id_box_click(self, event):
 		self.clicked_object_id = self.object_id_box.curselection()
 		top = self.class_dlg = Toplevel()
-		length_of_dialog_box = 30 * len(classnames)
+		length_of_dialog_box = 30 * len(self.classnames_obj.name_list)
 		top.geometry("400x" + str(length_of_dialog_box) + "+" + str(self.winfo_rootx()) + "+" + str(self.winfo_rooty()))
 		top.title("Enter class label for chosen object")
 		class_id = 0
-		for classname in classnames:
+		for classname in self.classnames_obj.name_list:
 			button_text = str(class_id) + " " + classname
 			button = Button(top, text=button_text, command=lambda i=class_id: self.chose_class_nr(i))
 			button.pack(fill=X)

@@ -2,13 +2,11 @@ import sys
 import glob
 import numpy as np
 import copy
+import os
 import matplotlib.image as mpimg
 import xml.etree.ElementTree as xml
 
 from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-from PIL import ImageTk
 
 from tkinter import messagebox
 
@@ -27,7 +25,6 @@ JUMP_FRAMES = 25
 TITLE = "Actanno V3.0"
 
 trackingLib = None
-classnames = ["null"]
 
 
 # Return an attribute value. Check for its existence
@@ -51,8 +48,9 @@ def mkdir_p(path):
 
 
 class AAController:
-	def __init__(self, t_lib):
+	def __init__(self, t_lib, classnames):
 		# yet unassigned inits
+		self.classnames_obj = classnames
 		global trackingLib
 		trackingLib = t_lib
 		self.old_frame = None
@@ -259,7 +257,7 @@ class AAController:
 
 							# convert Python types to C types
 							c_inrect = rect_mngr.to_c_aa_rect(inrect)
-							c_outrect = rect_mngr.c_AARect()
+							c_outrect = rect_mngr.CAARect()
 
 							# call C++ tracking lib
 							trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),ctypes.byref(c_inrect), ctypes.byref(c_outrect))
@@ -309,7 +307,7 @@ class AAController:
 
 				# convert Python types to C types
 				c_inrect = rect_mngr.to_c_aa_rect(rect_to_propagate)
-				c_outrect = rect_mngr.c_AARect()
+				c_outrect = rect_mngr.CAARect()
 
 				# call C++ tracking lib
 				trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
@@ -426,9 +424,10 @@ class AAController:
 							found_rects = True
 							fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(
 								self.class_assignations[cur_object_id]) + "\">\n")
+						framenr = int(self.filenames[i].split('bbox')[-1].split('.')[0])
 						s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
 						s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
-						s = s + "\" framenr=\"" + str(i + 1)
+						s = s + "\" framenr=\"" + str(framenr + 1)
 						s = s + "\" framefile=\"" + self.filenames[i] + "\"/>\n"
 						fd.write(s)
 			if found_rects:
@@ -466,7 +465,7 @@ class AAController:
 
 			for (j, r) in enumerate(f.get_rects()):
 				fd.write("	<object>")
-				fd.write("		<name>" + classnames[self.class_assignations[r.object_id - 1]] + "</name>")
+				fd.write("		<name>" + self.classnames_obj.name_list[self.class_assignations[r.object_id - 1]] + "</name>")
 				fd.write("		<pose>unknown</pose>")
 				fd.write("		<truncated>-1</truncated>")
 				fd.write("		<difficult>0</difficult>")

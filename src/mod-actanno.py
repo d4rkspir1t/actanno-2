@@ -10,6 +10,7 @@ from minimal_ctypes_opencv import *
 from config import cfg
 from config import cfg_from_file
 import supporting_files.frame_manager as frame_mngr
+import supporting_files.classname_manager as classn_mngr
 
 
 # ***************************************************************************
@@ -30,7 +31,6 @@ TITLE = "Actanno V3.0"
 # ***************************************************************************
 
 # change the list below to define your own classes
-classnames = ["null"]
 # classnames = ["head","fullbody","right-hand","left-hand"]
 # ***************************************************************************
 # XML parsing helper functions
@@ -85,7 +85,6 @@ trackingLib = None
 def main():
 	cur_path = sys.path[0]
 
-	global classnames
 	global trackingLib
 
 	config_path = sys.argv[1]
@@ -100,7 +99,7 @@ def main():
 	cfg.MAIN_DIR = folder_path
 	# print "Configuration :"
 	# print cfg
-	classnames = cfg.CLASSES
+	classnames_obj = classn_mngr.ClassNames(cfg.CLASSES)
 
 	# load C++ JM tracking library
 	if os.name == 'posix':
@@ -125,7 +124,7 @@ def main():
 	root = Tk()
 	root.protocol("WM_DELETE_WINDOW", onexit)
 	global ex
-	ex = frame_mngr.FrameManager(root, cur_path, trackingLib)
+	ex = frame_mngr.FrameManager(root, cur_path, trackingLib, classnames_obj)
 	root.mainloop()
 
 
