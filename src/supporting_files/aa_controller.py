@@ -159,10 +159,11 @@ class AAController:
 	def check_validity_frame(self, framenr):
 		msg = ''
 		ids = set()
-		for r in self.frames[framenr].rects:
+		for idx, r in enumerate(self.frames[framenr].rects):
 			if r.object_id in ids:
-				msg = msg + 'Activity nr. ' + str(r.object_id) + ' occurs multiple times in frame nr. ' + str(
-					framenr + 1) + '.\n'
+				self.frames[framenr].rects.pop(idx)
+				# msg = msg + 'Activity nr. ' + str(r.object_id) + ' occurs multiple times in frame nr. ' + str(
+				# 	framenr + 1) + '.\n'
 			else:
 				ids.add(r.object_id)
 		return msg
@@ -221,6 +222,8 @@ class AAController:
 			# print("we have", x, "frames")
 			if x > 0 and not force:
 				print("No propagation, target frame is not empty")
+				messagebox.showinfo("Warn - No propagation",
+									  "Target frame was not empty, go back a frame and try P for individual bbox propagation, or F for override.")
 			else:
 				self.frames[self.cur_frame_nr] = aaf.AAFrame()
 				y = len(self.frames[self.cur_frame_nr - 1].rects)
@@ -253,7 +256,8 @@ class AAController:
 
 							# convert C types to Python types
 							outrect = rect_mngr.to_aa_rect(c_outrect)
-							self.frames[self.cur_frame_nr].rects.append(outrect)
+							if outrect not in self.frames[self.cur_frame_nr].get_rects():
+								self.frames[self.cur_frame_nr].rects.append(outrect)
 
 				else:
 					print("No frames to propagate")

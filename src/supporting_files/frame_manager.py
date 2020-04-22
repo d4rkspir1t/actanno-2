@@ -6,8 +6,8 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageTk
 
-from tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar
-from tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL
+from tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar, StringVar
+from tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
 from tkinter import messagebox
 
 from config import cfg
@@ -67,7 +67,10 @@ class FrameManager(Frame):
 		self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
 
 		self.object_id_box = Listbox(self.parent)
-		self.switch_button = Button(self.parent, text="RGB <-> Depth")
+		self.id_text_var = StringVar()
+		self.id_text_var.set("Next id: 0")
+		self.id_setter = Button(self.parent, textvariable=self.id_text_var, state=DISABLED)
+		self.switch_button = Button(self.parent, text="RGB <-> Depth", state=DISABLED)
 		self.save_button = Button(self.parent, text="SAVE")
 		self.export_2voc = Button(self.parent, text="EXPORT2VOC")
 		self.quit_button = Button(self.parent, text="QUIT")
@@ -78,7 +81,8 @@ class FrameManager(Frame):
 		self.canvas.grid(row=0, column=0, rowspan=6)
 		self.object_id_box.grid(row=0, column=1, sticky=N + S)
 		self.fn_entry.grid(row=1, column=1)
-		self.switch_button.grid(row=2, column=1)
+		self.id_setter.grid(row=2, column=1)
+		# self.switch_button.grid(row=2, column=1)
 		self.save_button.grid(row=3, column=1)
 		self.export_2voc.grid(row=4, column=1)
 		self.quit_button.grid(row=5, column=1)
@@ -115,6 +119,7 @@ class FrameManager(Frame):
 		self.mousex = 1
 		self.mousey = 1
 		self.object_id_proposed_for_new_rect = len(self.ct.class_assignations) + 1
+		self.id_text_var.set("Next id: %d" % (int(self.object_id_proposed_for_new_rect)))
 		self.display_anno()
 		self.display_class_assignations()
 		self.fn_entry.delete(0, END)
@@ -162,7 +167,7 @@ class FrameManager(Frame):
 	def save_images_with_bbox(self):
 		grabcanvas = ImageGrab.grab(bbox=self.get_canvas_box())
 		# grabcanvas.show()
-		frame_name = 'bbox' + str(self.ct.cur_frame_nr).zfill(6) + '.png'
+		frame_name = str(self.ct.filenames[self.ct.cur_frame_nr].split('/')[-1])
 		path = os.path.join(cfg.BBOX_PREFIX, frame_name)
 		grabcanvas.save(path)
 
@@ -297,18 +302,20 @@ class FrameManager(Frame):
 		if cfg.BBOX_PREFIX != 'default':
 			self.save_images_with_bbox()
 		self.ct.videoname = self.fn_entry.get()
-		self.ct.export_xml()
 		self.check_validity()
+		self.ct.export_xml()
 		self.is_modified = False
+		messagebox.showinfo("Save", "File saved successfully!")
 
 	def save_xml2voc(self, event):
 		if cfg.BBOX_PREFIX != 'default':
 			self.save_images_with_bbox()
 		self.ct.videoname = self.fn_entry.get()
-		self.ct.export_xml()
 		self.check_validity()
+		self.ct.export_xml()
 		self.is_modified = False
 		self.ct.export_xml2voc()
+		messagebox.showinfo("Save", "VOC File saved successfully!")
 
 	def activate_switch(self, event):
 		self.ct.switchActivated = not self.ct.switchActivated
@@ -530,3 +537,9 @@ class FrameManager(Frame):
 	def debug_event(self, title):
 		self.event_counter += 1
 		# print 'event #' + str(self.event_counter), title
+
+	def set_next_id(self, event):
+		given_id = tkSimpleDialog.askinteger('Set Next ID',
+											 'Enter the id for the next bounding box you draw')
+		self.object_id_proposed_for_new_rect = given_id
+		self.id_text_var.set("Next id %d" % self.object_id_proposed_for_new_rect)
