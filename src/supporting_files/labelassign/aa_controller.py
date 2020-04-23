@@ -5,7 +5,6 @@ import copy
 import os
 import matplotlib.image as mpimg
 import xml.etree.ElementTree as xml
-from pprint import pprint
 
 from PIL import Image
 
@@ -23,7 +22,7 @@ CORNER_SIZE = 30
 CENTER_SIZE = 30
 JUMP_FRAMES = 25
 
-TITLE = "Actanno V3.0"
+TITLE = "Actanno V3.0 - Category-based labelling"
 
 trackingLib = None
 
@@ -50,15 +49,14 @@ def mkdir_p(path):
 
 class AAController:
 	def __init__(self, t_lib, classnames):
-		# yet unassigned inits
 		self.classnames_obj = classnames
 		global trackingLib
 		trackingLib = t_lib
+
 		self.old_frame = None
-		# An array holding an AAFrame object for each frame of the video
 		self.frames = []
-		# An array holding the classnr for each object nr. ("object_id")
 		self.class_assignations = []
+
 		# The nr. of the currently visible frame
 		self.cur_frame_nr = 0
 		self.cur_image = None

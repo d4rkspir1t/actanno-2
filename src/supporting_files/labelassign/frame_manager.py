@@ -8,7 +8,7 @@ from PIL import ImageTk
 
 from tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar, StringVar
 from tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 
 from config import cfg
 import supporting_files.labelassign.aa_controller as aac
@@ -22,7 +22,7 @@ CORNER_SIZE = 30
 CENTER_SIZE = 30
 JUMP_FRAMES = 25
 
-TITLE = "Actanno V3.0"
+TITLE = "Actanno V3.0 - Category-based labelling"
 
 trackingLib = None
 
@@ -539,7 +539,7 @@ class FrameManager(Frame):
 		# print 'event #' + str(self.event_counter), title
 
 	def set_next_id(self, event):
-		given_id = tkSimpleDialog.askinteger('Set Next ID',
+		given_id = simpledialog.askinteger('Set Next ID',
 											 'Enter the id for the next bounding box you draw')
 		self.object_id_proposed_for_new_rect = given_id
 		self.id_text_var.set("Next id %d" % self.object_id_proposed_for_new_rect)
