@@ -9,7 +9,7 @@ from minimal_ctypes_opencv import *
 # from minimal_ctypes_opencv import *
 from config import cfg
 from config import cfg_from_file
-import supporting_files.frame_manager as frame_mngr
+import supporting_files.labelassign.frame_manager as frame_mngr
 import supporting_files.classname_manager as classn_mngr
 
 
@@ -24,7 +24,7 @@ CORNER_SIZE = 30
 CENTER_SIZE = 30
 JUMP_FRAMES = 25
 
-TITLE = "Actanno V3.0"
+TITLE = "Actanno V3.0 - Category-based labelling"
 
 # ***************************************************************************
 # The data structure storing the annotations

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from Tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar, StringVar
-from Tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
+from tkinter import Tk, Canvas, Frame, BOTH, Listbox, Toplevel, Message, Button, Entry, Scrollbar, Scale, IntVar, StringVar
+from tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, TOP, BOTTOM, HORIZONTAL, DISABLED
+from tkinter import messagebox
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -46,7 +47,7 @@ CORNER_SIZE = 30
 CENTER_SIZE = 30
 JUMP_FRAMES = 25
 
-TITLE = "Actanno V4.0"
+TITLE = "Actanno V3.0 - Index-based labelling"
 
 # ***************************************************************************
 # The data structure storing the annotations
@@ -127,137 +128,6 @@ def get_att(node, attname):
         tkMessageBox.showinfo(TITLE, "attribute " + attname + " not found in tag " + node.tag)
         sys.exit(1)
     return rv
-
-
-# ***************************************************************************
-
-
-class AARect:
-    """A rectangle (bounding box) and its running id"""
-
-    def __init__(self, x1, y1, x2, y2, object_id):
-        if x1 < x2:
-            self.x1 = x1
-            self.x2 = x2
-        else:
-            self.x1 = x2
-            self.x2 = x1
-        if y1 < y2:
-            self.y1 = y1
-            self.y2 = y2
-        else:
-            self.y1 = y2
-            self.y2 = y1
-        self.object_id = object_id
-
-    def show(self):
-        print("x1=", self.x1, "  y1=", self.y1, "  x2=", self.x2, "  y2=", self.y2, "  id=", self.object_id)
-
-
-# ***************************************************************************
-# C type matching Python type
-class c_AARect(ctypes.Structure):
-    _fields_ = [("x1", ctypes.c_int), ("y1", ctypes.c_int), ("x2", ctypes.c_int), ("y2", ctypes.c_int), ("objectId", ctypes.c_int)]
-
-
-# ***************************************************************************
-# convert AARect to c_AARect
-def to_c_aa_rect(r):
-    return c_AARect(x1=int(r.x1), y1=int(r.y1), x2=int(r.x2), y2=int(r.y2), objectId=int(r.object_id))
-
-
-# ***************************************************************************
-# convert c_AARect to AARect
-def to_aa_rect(c_r):
-    return AARect(c_r.x1, c_r.y1, c_r.x2, c_r.y2, c_r.objectId)
-
-
-# ***************************************************************************
-class SemMousePos:
-    """A semantic mouse position: in which rectangle (index) is the mouse
-    and which semantic position does it occupy. sempose can be:
-    ul	upper left corner
-    ur	upper right corner
-    ll	lower left corner
-    lr	lower right corner
-    c	center
-    g	general position in the recangle
-    n	no rectangles"""
-
-    def __init__(self, index, sem_pos):
-        self.index = index
-        self.sem_pos = sem_pos
-
-
-# ***************************************************************************
-
-
-class AAFrame:
-    """All rectangles of a frame"""
-
-    def __init__(self):
-        self.rects = []
-
-    def get_rects(self):
-        return self.rects
-
-    # Check the position of the mouse cursor with respect to corners of all
-    # the rectangles, as well as the centers. If it is not near anything,
-    # still check for the nearest center.
-    # position x,y
-    def get_sem_mouse_pos(self, x, y):
-        # First check for the corners
-        min_val = 99999999
-        arg_idx = -1
-        arg_sem = ''
-        for (i, r) in enumerate(self.rects):
-            d = (r.x1 - x) * (r.x1 - x) + (r.y1 - y) * (r.y1 - y)
-            if d < min_val:
-                min_val = d
-                arg_idx = i
-                arg_sem = 'ul'
-            d = (r.x1 - x) * (r.x1 - x) + (r.y2 - y) * (r.y2 - y)
-            if d < min_val:
-                min_val = d
-                arg_idx = i
-                arg_sem = 'll'
-            d = (r.x2 - x) * (r.x2 - x) + (r.y1 - y) * (r.y1 - y)
-            if d < min_val:
-                min_val = d
-                arg_idx = i
-                arg_sem = 'ur'
-            d = (r.x2 - x) * (r.x2 - x) + (r.y2 - y) * (r.y2 - y)
-            if d < min_val:
-                min_val = d
-                arg_idx = i
-                arg_sem = 'lr'
-
-        # We are near enough to a corner, we are done
-        if min_val < CORNER_DIST_THR * CORNER_DIST_THR:
-            return SemMousePos(arg_idx, arg_sem)
-
-        # Now check for the nearest center
-        min_val = 99999999
-        arg_idx = -1
-        for (i, r) in enumerate(self.rects):
-            cx = 0.5 * (r.x1 + r.x2)
-            cy = 0.5 * (r.y1 + r.y2)
-            d = (cx - x) * (cx - x) + (cy - y) * (cy - y)
-            if d < min_val:
-                min_val = d
-                arg_idx = i
-
-        if arg_idx < 0:
-            return SemMousePos(-1, "n")
-
-        if min_val < CENTER_DIST_THR * CENTER_DIST_THR:
-            return SemMousePos(arg_idx, "c")
-        else:
-            return SemMousePos(arg_idx, "g")
-
-
-# ***************************************************************************
-
 
 class AAController:
     def __init__(self):

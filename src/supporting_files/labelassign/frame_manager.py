@@ -11,7 +11,7 @@ from tkinter import N, S, W, E, NW, SW, NE, SE, CENTER, END, LEFT, RIGHT, X, Y, 
 from tkinter import messagebox
 
 from config import cfg
-import supporting_files.aa_controller as aac
+import supporting_files.labelassign.aa_controller as aac
 import supporting_files.semantic_mouse_position_manager as smp_mngr
 
 
