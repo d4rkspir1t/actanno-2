@@ -435,10 +435,10 @@ class AAController:
         except IOError:
             messagebox.showinfo(TITLE, "Could not save to the specified XML file. Please check the location. "
                                          "Does the directory exist?")
-        fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-        fd.write("<tagset>")
-        fd.write("  <video>")
-        fd.write("	<videoName>" + self.video_name + "</videoName>")
+        fd.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        fd.write("<tagset>\n")
+        fd.write("  <video>\n")
+        fd.write("	<videoName>" + self.video_name + "</videoName>\n")
 
         # self.filenames[self.curFrameNr]
         # Travers all different running id's
@@ -464,17 +464,19 @@ class AAController:
                         if not found_rects:
                             found_rects = True
                             fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\">\n")
+                        framenr = int(self.filenames[i].split(cfg.FNAME_PREFIX)[-1].split('.')[0])
                         s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
                         s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
-                        s = s + "\" framenr=\"" + str(i + 1)
+                        s = s + "\" framenr=\"" + str(framenr)
+                        s = s + "\" batch-framenr=\"" + str(i)
                         s = s + "\" framefile=\"" + self.filenames[i]
                         # print 'exportxmlfilename object id ', cur_object_id+1
                         # print 'objclass ', obj_class
                         s = s + "\" class=\"" + str(obj_class) + "\"/>\n"
                         fd.write(s)
             if found_rects:
-                fd.write("	</object>")
-        fd.write("  </video>")
+                fd.write("	</object>\n")
+        fd.write("  </video>\n")
         fd.write("</tagset>")
         fd.close()
 
@@ -556,7 +558,7 @@ class AAController:
             for bb in bbs:
 
                 # Add the bounding box to the frames() list
-                bfnr = int(get_att(bb, "framenr"))
+                bfnr = int(get_att(bb, "batch-framenr"))
                 bx = int(get_att(bb, "x"))
                 by = int(get_att(bb, "y"))
                 bw = int(get_att(bb, "width"))

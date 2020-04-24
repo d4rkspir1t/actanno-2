@@ -91,7 +91,7 @@ class MySqlManager:
         query = "INSERT INTO hum_to_group (frame_no, human_id, label) VALUES (%s, %s, %s);"
         self.cursor.execute(query, fr_info_single)
         self.db.commit()
-        print('ln 563 insert frame single: ', self.cursor.rowcount, "record inserted %s %s %s" % (fr_info_single))
+        # print('ln 563 insert frame single: ', self.cursor.rowcount, "record inserted %s %s %s" % (fr_info_single))
 
     def count_ca_frame_objects(self, fr_no):
         query = "SELECT COUNT(*) FROM hum_to_group WHERE frame_no = %s;" % fr_no

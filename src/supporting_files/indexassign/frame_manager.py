@@ -173,7 +173,7 @@ class FrameManager(Frame):
 
     def save_images_with_bbox(self):
         grabcanvas = ImageGrab.grab(bbox=self.get_canvas_box())
-        frame_name = 'bbox' + str(self.ct.cur_frame_nr).zfill(6) + '.png'
+        frame_name = str(self.ct.filenames[self.ct.cur_frame_nr].split('/')[-1])
         path = os.path.join(cfg.BBOX_PREFIX, frame_name)
         grabcanvas.save(path)
 

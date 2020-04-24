@@ -7,3 +7,4 @@ D_PREFIX: 'default'
 AID_IMG: 'f-formations.png'
 CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "rectangular"]
 BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/kcltestimages/bbox_rgb'
+FNAME_PREFIX: 'bbox'

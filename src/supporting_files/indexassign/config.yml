@@ -7,4 +7,5 @@ RGB_PREFIX: '/bbox'
 AID_IMG: '/keybind_humanno.png'
 CLASSES: ["N/A"]
 BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/human-notation/seg1_final'
+FNAME_PREFIX: 'bbox'
 

@@ -411,7 +411,7 @@ class AAController:
 							found_rects = True
 							fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(
 								self.class_assignations[cur_object_id]) + "\">\n")
-						framenr = int(self.filenames[i].split('bbox')[-1].split('.')[0])
+						framenr = int(self.filenames[i].split(cfg.FNAME_PREFIX)[-1].split('.')[0])
 						s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
 						s = s + "\" width=\"" + str(int(r.x2 - r.x1 + 1)) + "\" height=\"" + str(int(r.y2 - r.y1 + 1))
 						s = s + "\" framenr=\"" + str(framenr)
