@@ -17,7 +17,7 @@ class MySqlManager:
             pass
         self.cursor.execute(
             "CREATE TABLE hum_to_group (id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, "
-            "frame_no INT(11), human_id INT(11), label INT(11));")
+            "frame_no INT(11), human_id INT(11), label INT(11), tmp_obj_id INT(11));")
         self.cursor.execute("DESC hum_to_group;")
         print(self.cursor.fetchall())
 

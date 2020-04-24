@@ -3,10 +3,11 @@
 
 from tkinter import Tk
 import sys
+import os
 
-from src.minimal_ctypes_opencv import *
-from src.config import cfg
-from src.config import cfg_from_file
+from minimal_ctypes_opencv import *
+from config import cfg
+from config import cfg_from_file
 
 import supporting_files.indexassign.frame_manager as frame_mngr
 import supporting_files.classname_manager as classn_mngr

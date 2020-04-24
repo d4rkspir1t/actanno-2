@@ -126,7 +126,7 @@ class FrameManager(Frame):
         self.mousex = 1
         self.mousey = 1
         # print 'curframe ', self.ct.cur_frame_nr
-        count = self.ct.count_ca_frame_objects(self.ct.cur_frame_nr)
+        count = self.mysql_mngr_obj.count_ca_frame_objects(self.ct.cur_frame_nr)
         self.object_id_proposed_for_new_rect = count + 1
         self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
         self.display_anno()
@@ -161,8 +161,7 @@ class FrameManager(Frame):
         if self.is_modified:
             if messagebox.askyesno(title='Unsaved changes', message='The annotation has been modified. '
                                                                       'Do you really want to quit?'):
-                messagebox.showinfo("First help", "A backup of the latest changes can be found "
-                                                    "in save.xml, just in case.")
+                pass
             else:
                 ok = False
         if ok:
@@ -368,7 +367,7 @@ class FrameManager(Frame):
         # object_id = int(self.clicked_object_id[0])
         # print 'objectidboxclick object id ', object_id+1
         # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
-        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
+        self.mysql_mngr_obj.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
         self.display_anno()
         self.display_class_assignations()
         self.canvas.update()
@@ -400,6 +399,9 @@ class FrameManager(Frame):
             self.cur_width = abs(r.x2 - r.x1)
             self.cur_heigth = abs(r.y2 - r.y1)
             self.cur_object_id = r.object_id
+            obj_info = self.mysql_mngr_obj.select_ca_frame_single(self.ct.cur_frame_nr, self.cur_object_id)
+            self.tmp_obj_label = obj_info[1]
+            print(obj_info)
             self.ct.del_rect(sempos.index)
         # We start drawing a new rectangle
         else:
@@ -428,7 +430,10 @@ class FrameManager(Frame):
                 # If we create a new rectangle, we check whether we moved
                 # since the first click (Non trivial rectangle)?
                 if (self.state != "d") or (abs(event.x - self.curx1) > 5) or (abs(event.y - self.cury1) > 5):
-                    self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_object_id, -1)
+                    if self.state != 'd':
+                        self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_object_id, -1, self.tmp_obj_label)
+                    else:
+                        self.ct.add_rect(self.curx1, self.cury1, self.curx2, self.cury2, self.cur_object_id, -1)
                     if cfg.BBOX_PREFIX != 'default':
                         self.save_images_with_bbox()
                     self.is_modified = True
@@ -436,12 +441,18 @@ class FrameManager(Frame):
                     if self.state == "d":
                         self.ct.use_object_id(self.cur_object_id)
                         self.display_class_assignations()
-                        self.object_id_proposed_for_new_rect = self.object_id_proposed_for_new_rect + 1
+                        frame_info = self.mysql_mngr_obj.select_ca_frame_info(self.ct.cur_frame_nr)
+                        max_id = 0
+                        for info in frame_info:
+                            if max_id < info[0]:
+                                max_id = info[0]
+                        self.object_id_proposed_for_new_rect = max_id + 1
                         self.id_text_var.set("Next id: %d" % self.object_id_proposed_for_new_rect)
             self.curx2 = event.x
             self.cury2 = event.y
         self.state = ""
         self.display_anno()
+        self.display_class_assignations()
 
     def right_mouse_down(self, event):
         # print "right mouse down"
@@ -497,11 +508,11 @@ class FrameManager(Frame):
             if i == sempos.index:
                 curcol = "blue"
             else:
-                curcol = "red"
+                curcol = "blue"
             draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
             draw.rectangle([r.x1 + 1, r.y1 + 1, r.x2 - 1, r.y2 - 1], outline=curcol)
 
-            frame_info = self.ct.select_ca_frame_info(self.ct.cur_frame_nr)
+            frame_info = self.mysql_mngr_obj.select_ca_frame_info(self.ct.cur_frame_nr)
             frame_keys = [info[0] for info in frame_info]
             frame_labels = [info[1] for info in frame_info]
             x = frame_labels
@@ -510,7 +521,7 @@ class FrameManager(Frame):
                 if key == r.object_id:
                     label = x[idx]
                     break
-            draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id)+' - '+str(label), font=self.img_font, fill=curcol)
+            draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)
 
             # Draw the icons
             if i == sempos.index:
@@ -534,8 +545,8 @@ class FrameManager(Frame):
     def display_class_assignations(self):
         self.object_id_box.delete(0, END)
         # UNCOMMENT THIS FOR CMD CLASS LABEL TRACKING
-        # print self.ct.class_assignations
-        frame_info = self.ct.select_ca_frame_info(self.ct.cur_frame_nr)
+        frame_info = self.mysql_mngr_obj.select_ca_frame_info(self.ct.cur_frame_nr)
+        print(frame_info)
         frame_keys = [info[0] for info in frame_info]
         frame_labels = [info[1] for info in frame_info]
         x = frame_labels
@@ -560,7 +571,7 @@ class FrameManager(Frame):
         object_id = int(self.clicked_object_id[0])
         # print 'objectidboxclick object id ', object_id+1
         # print 'objectidcoxclicl curfrnr ', self.ct.cur_frame_nr
-        self.ct.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
+        self.mysql_mngr_obj.update_ca_frame_single(self.ct.cur_frame_nr, human_id, class_id)
         self.display_class_assignations()
         self.is_modified = True
 
@@ -568,18 +579,18 @@ class FrameManager(Frame):
         sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
         # print sempos.index
         if sempos.index > -1:
-            count = self.ct.count_ca_frames()
+            count = self.mysql_mngr_obj.count_ca_frames()
             for frame_no in range(self.ct.cur_frame_nr+1, count):
-                frame_info = self.ct.select_ca_frame_info(frame_no)
+                frame_info = self.mysql_mngr_obj.select_ca_frame_info(frame_no)
                 frame_keys = [info[0] for info in frame_info]
                 if sempos.index+1 in frame_keys:
                     # print 'could propagate label ', frame_no, sempos.index+1
-                    frame_info = self.ct.select_ca_frame_single(frame_no, sempos.index+1)
-                    prev_frame_info = self.ct.select_ca_frame_single(self.ct.cur_frame_nr, sempos.index+1)
+                    frame_info = self.mysql_mngr_obj.select_ca_frame_single(frame_no, sempos.index+1)
+                    prev_frame_info = self.mysql_mngr_obj.select_ca_frame_single(self.ct.cur_frame_nr, sempos.index+1)
                     if frame_info is not None:
-                        self.ct.update_ca_frame_single(frame_no, sempos.index+1, prev_frame_info[1])
+                        self.mysql_mngr_obj.update_ca_frame_single(frame_no, sempos.index+1, prev_frame_info[1])
                     else:
-                        self.ct.insert_ca_frame_label(frame_no, sempos.index+1, prev_frame_info[1])
+                        self.mysql_mngr_obj.insert_ca_frame_label(frame_no, sempos.index+1, prev_frame_info[1])
         messagebox.showinfo("Propagation", "Single label propagated through the set.")
         self.display_anno()
         self.display_class_assignations()
@@ -587,21 +598,21 @@ class FrameManager(Frame):
         self.is_modified = True
 
     def propagate_all_labels(self, event):
-        count = self.ct.count_ca_frames()
+        count = self.mysql_mngr_obj.count_ca_frames()
         for frame_no in range(self.ct.cur_frame_nr + 1, count):
             # print 'could propagate label ', frame_no, sempos.index+1
-            frame_all_info = self.ct.select_ca_frame_info(frame_no)
+            frame_all_info = self.mysql_mngr_obj.select_ca_frame_info(frame_no)
             frame_all_keys = [info[0] for info in frame_all_info]
-            prev_frame_all_info = self.ct.select_ca_frame_info(self.ct.cur_frame_nr)
+            prev_frame_all_info = self.mysql_mngr_obj.select_ca_frame_info(self.ct.cur_frame_nr)
             prev_frame_all_keys = [info[0] for info in prev_frame_all_info]
             for object_id in prev_frame_all_keys:
                 if object_id in frame_all_keys:
-                    frame_info = self.ct.select_ca_frame_single(frame_no, object_id)
-                    prev_frame_info = self.ct.select_ca_frame_single(self.ct.cur_frame_nr, object_id)
+                    frame_info = self.mysql_mngr_obj.select_ca_frame_single(frame_no, object_id)
+                    prev_frame_info = self.mysql_mngr_obj.select_ca_frame_single(self.ct.cur_frame_nr, object_id)
                     if frame_info is not None:
-                        self.ct.update_ca_frame_single(frame_no, object_id, prev_frame_info[1])
+                        self.mysql_mngr_obj.update_ca_frame_single(frame_no, object_id, prev_frame_info[1])
                     else:
-                        self.ct.insert_ca_frame_label(frame_no, object_id, prev_frame_info[1])
+                        self.mysql_mngr_obj.insert_ca_frame_label(frame_no, object_id, prev_frame_info[1])
         messagebox.showinfo("Propagation", "All labels in frame propagated through the set.")
         self.display_anno()
         self.display_class_assignations()
