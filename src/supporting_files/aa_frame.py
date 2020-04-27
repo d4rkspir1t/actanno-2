@@ -48,9 +48,11 @@ class AAFrame:
 				min_val = d
 				arg_idx = i
 				arg_sem = 'lr'
+			# print('argid', arg_idx)
 
 		# We are near enough to a corner, we are done
 		if min_val < CORNER_DIST_THR * CORNER_DIST_THR:
+			# print('smp-idx -', arg_idx)
 			return smp_mngr.SemMousePos(arg_idx, arg_sem)
 
 		# Now check for the nearest center
@@ -68,6 +70,8 @@ class AAFrame:
 			return smp_mngr.SemMousePos(-1, "n")
 
 		if min_val < CENTER_DIST_THR * CENTER_DIST_THR:
+			# print('smp-idx c', arg_idx)
 			return smp_mngr.SemMousePos(arg_idx, "c")
 		else:
+			# print('smp-idx g', arg_idx)
 			return smp_mngr.SemMousePos(arg_idx, "g")

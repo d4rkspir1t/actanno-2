@@ -386,7 +386,7 @@ class FrameManager(Frame):
         # Which rectangle is the nearest one to the mouse cursor, and what is
         # its relative position (corners, center, general position)?
         sempos = self.ct.get_sem_mouse_pos(self.mousex, self.mousey)
-
+        print('MDown', sempos.sem_pos)
         # We change an existing rectangle. Remove the old one from the
         # controler
         if sempos.sem_pos in ("ul", "ur", "ll", "lr", "c"):
@@ -400,9 +400,13 @@ class FrameManager(Frame):
             self.cur_heigth = abs(r.y2 - r.y1)
             self.cur_object_id = r.object_id
             obj_info = self.mysql_mngr_obj.select_ca_frame_single(self.ct.cur_frame_nr, self.cur_object_id)
+            print('MDown', self.cur_object_id)
             self.tmp_obj_label = obj_info[1]
             print(obj_info)
             self.ct.del_rect(sempos.index)
+            print('Mdown - sempos idx', sempos.index)
+            frame_info = self.mysql_mngr_obj.select_ca_frame_info(self.ct.cur_frame_nr)
+            print(frame_info)
         # We start drawing a new rectangle
         else:
             self.state = "d"
