@@ -505,6 +505,8 @@ class FrameManager(Frame):
 		self.object_id_box.delete(0, END)
 		x = self.ct.class_assignations
 		for i in range(len(x)):
+			if x[i] is None:
+				continue
 			if x[i] < 0:
 				self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
 			else:

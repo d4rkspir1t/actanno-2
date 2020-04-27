@@ -146,6 +146,8 @@ class AAController:
 		# Check for unassigned ClassAssignations (no known object class)
 		msg2 = ''
 		for (i, x) in enumerate(self.class_assignations):
+			if x is None:
+				continue
 			if x < 0:
 				msg2 = msg2 + str(i + 1) + ","
 		if msg2 != '':
