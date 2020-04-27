@@ -28,7 +28,7 @@ class MySqlManager:
             pass
 
     def select_ca_frame_info(self, fr_no):
-        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %s;" % fr_no
+        query = "SELECT human_id, label FROM hum_to_group WHERE frame_no = %s ORDER BY human_id;" % fr_no
         self.cursor.execute(query)
         frame_info = self.cursor.fetchall()
         # for info in frame_info:

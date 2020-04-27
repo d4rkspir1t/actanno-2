@@ -395,6 +395,11 @@ class AAController:
         if fnr >= len(self.frames):
             raise Exception()
         self.frames[fnr].get_rects().append(rect_mngr.AARect(x1, y1, x2, y2, object_id))
+        unsorted_rects = self.frames[fnr].get_rects()
+        # print('Addrect unsorted: ',  ', '.join(str(i.object_id) for i in unsorted_rects))
+        sorted_rects = sorted(unsorted_rects, key=lambda x: x.object_id, reverse=False)
+        # print('Addrect unsorted: ',  ', '.join(str(i.object_id) for i in sorted_rects))
+        self.frames[fnr].rects = sorted_rects
         # print 'addrect object id ', object_id
         frame_info = self.mysql_mngr_obj.select_ca_frame_single(fnr, object_id)
         if frame_info is None:
