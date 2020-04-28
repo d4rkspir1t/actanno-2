@@ -362,6 +362,7 @@ class AAController:
 		self.frames[fnr].get_rects().append(rect_mngr.AARect(x1, y1, x2, y2, object_id))
 
 	def del_rect(self, index):
+		# print('happens')
 		del self.frames[self.cur_frame_nr].get_rects()[index]
 
 	def get_sem_mouse_pos(self, x, y):

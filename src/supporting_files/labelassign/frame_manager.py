@@ -380,7 +380,7 @@ class FrameManager(Frame):
 			self.cury1 = event.y
 			self.curx2 = -1
 			self.cury2 = -1
-
+		print('down idx', sempos.index)
 		self.cur_sem_pos = smp_mngr.SemMousePos(-1, "g")
 
 	def left_mouse_up(self, event):
