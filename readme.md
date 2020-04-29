@@ -12,15 +12,21 @@ RICA Contributor: Viktor Schmuck (svmotric@gmail.com, viktor.schmuck@kcl.ac.uk)
 PLEASE ACKNOWLEDGE THE AUTHORS AND PUBLICATION ACCORDING TO THE
 REPOSITORY https://github.com/d4rkspir1t/actanno-v3 OR IF NOT AVAILABLE:
 
-RCNN RGBD pour la détection de personnes en conditions difficiles, J.Guerry and B. Le Saux and D. Filliat, Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
+RCNN RGBD pour la détection de personnes en conditions difficiles
+
+J.Guerry and B. Le Saux and D. Filliat, Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
 
 and
 
-Evaluation of video activity localizations integrating quality and quantity measurements, C Wolf, J. Mille, E. Lombardi, O. Celiktutan, M. Jiu, E. Dogan, G. Eren, M. Baccouche, E. Dellandrea, C.-E. Bichot, C. Garcia, B. Sankur, In Computer Vision and Image Understanding (127):14-30, 2014. 
+Evaluation of video activity localizations integrating quality and quantity measurements
+
+C Wolf, J. Mille, E. Lombardi, O. Celiktutan, M. Jiu, E. Dogan, G. Eren, M. Baccouche, E. Dellandrea, C.-E. Bichot, C. Garcia, B. Sankur, In Computer Vision and Image Understanding (127):14-30, 2014. 
 
 and
 
-RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
+RICA: Robocentric Indoor Crowd Analysis Dataset
+
+Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
 
 *****************************************************************************
 
