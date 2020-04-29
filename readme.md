@@ -10,7 +10,7 @@ RICA Contributor: Viktor Schmuck (svmotric@gmail.com, viktor.schmuck@kcl.ac.uk)
 *****************************************************************************
 
 PLEASE ACKNOWLEDGE THE AUTHORS AND PUBLICATION ACCORDING TO THE
-REPOSITORY https://github.com/d4rkspir1t/actanno-2 OR IF NOT AVAILABLE:
+REPOSITORY https://github.com/d4rkspir1t/actanno-v3 OR IF NOT AVAILABLE:
 
 RCNN RGBD pour la détection de personnes en conditions difficiles, J.Guerry and B. Le Saux and D. Filliat, Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
 
