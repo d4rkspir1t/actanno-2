@@ -24,7 +24,7 @@ RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In P
 
 *****************************************************************************
 
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/bbox003646_censored.jpg | width=100)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/bbox003646_censored.jpg)
 
 *****************************************************************************
 *****************************************************************************
