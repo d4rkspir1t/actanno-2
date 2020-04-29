@@ -1,4 +1,4 @@
-ACTANNO (v3) : Object annotation tool
+# ACTANNO (v3) : Object annotation tool #
 
 LIRIS Authors: Christian Wolf, Eric Lombardi, Julien Mille
 Actanno V1 
@@ -29,12 +29,35 @@ RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In P
 *****************************************************************************
 *****************************************************************************
 
-SETUP : 
+## SETUP ## 
+### Backend setup ###
+1. Install OpenCV
+1. Install TKinter
+1. Set up an environment:
+> 1. Set up a Python 3.7 base environment
+> 1. `pip install pyscreenshot pillow numpy matplotlib easydict` 
+
+### Configuration ###
+The configuration files can be found in the respective supporting files folders (label- or indexassign).
+The run commands are (when inside the `src` folder or an IDE):
+
+`python actanno-v3-labelassign.py ../supporting_files/labelassign/ ../group_images/`
+
+`python actanno-v3-indexassign.py ../supporting_files/indexassign/ ../group_to_human_images/` 
+
+... where the first input points to the folder of the configuration file(s). And the second parameter should 
+point to the input images. This folder will also be the location of the resulting XML file.
+
+### MySql setup ###
+1. Install MySql and the python mysql connector.
+1. Set up the MySql environment e.g. by:
+>1. `CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';`
+>1. `GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' IDENTIFIED BY 'password';`
 
 *****************************************************************************
-Changelog:
+## CHANGELOG ##
 
-29.04.20 
+29.04.20 vs
 - 2 versions of actanno v3 created
 - added label and index assignment versions (src/actanno-v3-labelassign.py, src/actanno-v3-indexassign.py)
 - added user feedback pop-ups
@@ -126,7 +149,3 @@ Changelog:
 - begin development
 
 *****************************************************************************
-
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' IDENTIFIED BY 'password';
-frame_no INT(11), human_id INT(11), label INT(11))
