@@ -5,3 +5,5 @@ kcltestimages/
 venv/
 .idea
 human-notation/
+trends_in_CN*
+mnist*

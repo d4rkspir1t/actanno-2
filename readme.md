@@ -9,8 +9,10 @@ Actanno V1
 
 ONERA Contributor : Joris Guerry (joris.guerry@onera.fr)
 
+RICA Contributor: Viktor Schmuck (svmotric@gmail.com, viktor.schmuck@kcl.ac.uk)
+
 PLEASE ACKNOWLEDGE THE AUTHORS AND PUBLICATION ACCORDING TO THE
-REPOSITORY github.com/jorisgu/actanno-2 OR IF NOT AVAILABLE:
+REPOSITORY https://github.com/d4rkspir1t/actanno-2 OR IF NOT AVAILABLE:
 
 >"RCNN RGBD pour la détection de personnes en conditions difficiles"
 >><cite>J.Guerry and B. Le Saux and D. Filliat,</cite>,Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
@@ -20,11 +22,29 @@ and
 >"Evaluation of video activity localizations integrating quality and quantity measurements"
 >>C Wolf, J. Mille, E. Lombardi, O. Celiktutan, M. Jiu, E. Dogan, G. Eren, M. Baccouche, E. Dellandrea, C.-E. Bichot, C. Garcia, B. Sankur, In Computer Vision and Image Understanding (127):14-30, 2014. 
 
-Todo :
-- Add callbacks on basic timeline functions to update the slider
-- Update "howTo"
+and
 
+>"RICA: Robocentric Indoor Crowd Analysis Dataset"
+>>Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
+
+*****************************************************************************
+*****************************************************************************
+SETUP : 
+
+*****************************************************************************
 Changelog:
+
+29.04.20 
+- 2 versions of actanno v3 created
+- added label and index assignment versions (src/actanno-v3-labelassign.py, src/actanno-v3-indexassign.py)
+- added user feedback pop-ups
+- added annotated image saving with consistent naming
+- index assignment requires mysql to run -> speed improvement
+- code cleaned and corrected, made in a better OOP style
+- code updated to run with a python 3.7 backend and the updated version of tkinter
+- indexassign -- add keyboard shortcut : tab -> label assignment window pop-up
+
+*****************************************************************************
 
 12.04.17 jg:
 - add PASCAL VOC format exportation
@@ -46,7 +66,7 @@ Changelog:
 - rectangle can go at the edge of the window without disappear
 - change tostring-> tobytes in src/minimal_ctypes_opencv.py (due update of opencv)
 
-##################################################################################################################
+*****************************************************************************
 
 10.09.14 el:
 - Fix performance issue (slow-down when first rectangles are drawn).
