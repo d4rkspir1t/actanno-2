@@ -1,8 +1,4 @@
-![http://jorisguerry.fr/?page_id=142](http://jorisguerry.fr/wp-content/uploads/2017/05/acctano-v2_1-1024x576.png)
-![http://jorisguerry.fr/?page_id=142](http://jorisguerry.fr/wp-content/uploads/2017/05/acctano-v2_0-768x432.png)
-
-*****************************************************************************
-ACTANNO : Object annotation tool
+ACTANNO (v3) : Object annotation tool
 
 LIRIS Authors: Christian Wolf, Eric Lombardi, Julien Mille
 Actanno V1 
@@ -11,24 +7,35 @@ ONERA Contributor : Joris Guerry (joris.guerry@onera.fr)
 
 RICA Contributor: Viktor Schmuck (svmotric@gmail.com, viktor.schmuck@kcl.ac.uk)
 
+*****************************************************************************
+
 PLEASE ACKNOWLEDGE THE AUTHORS AND PUBLICATION ACCORDING TO THE
 REPOSITORY https://github.com/d4rkspir1t/actanno-2 OR IF NOT AVAILABLE:
 
->"RCNN RGBD pour la détection de personnes en conditions difficiles"
->><cite>J.Guerry and B. Le Saux and D. Filliat,</cite>,Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
+RCNN RGBD pour la détection de personnes en conditions difficiles, J.Guerry and B. Le Saux and D. Filliat, Groupe d'Etudes du Traitement du Signal et des Images (GRETSI) 2017
 
 and
 
->"Evaluation of video activity localizations integrating quality and quantity measurements"
->>C Wolf, J. Mille, E. Lombardi, O. Celiktutan, M. Jiu, E. Dogan, G. Eren, M. Baccouche, E. Dellandrea, C.-E. Bichot, C. Garcia, B. Sankur, In Computer Vision and Image Understanding (127):14-30, 2014. 
+Evaluation of video activity localizations integrating quality and quantity measurements, C Wolf, J. Mille, E. Lombardi, O. Celiktutan, M. Jiu, E. Dogan, G. Eren, M. Baccouche, E. Dellandrea, C.-E. Bichot, C. Garcia, B. Sankur, In Computer Vision and Image Understanding (127):14-30, 2014. 
 
 and
 
->"RICA: Robocentric Indoor Crowd Analysis Dataset"
->>Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
+RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
+
+*****************************************************************************
+
+![](./sample_frames.bbox003646_censored.jpg)
+
+| RGB            |  Wide-angle |
+:-------------------------:|:-------------------------:
+![](./sample_frames/frame005000.jpg)  |  ![](./sample_frames/frame001850.jpg)
+![](./sample_frames/frame015000.jpg)  |  ![](./sample_frames/frame005796.jpg)
+![](./sample_frames/frame025000.jpg)  |  ![](./sample_frames/frame010019.jpg)
+![](./sample_frames/frame037500.jpg)  |  ![](./sample_frames/frame015410.jpg)
 
 *****************************************************************************
 *****************************************************************************
+
 SETUP : 
 
 *****************************************************************************
