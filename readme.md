@@ -24,14 +24,14 @@ RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In P
 
 *****************************************************************************
 
-![](./sample_frames.bbox003646_censored.jpg)
+![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/bbox003646_censored.jpg)
 
 | RGB            |  Wide-angle |
 :-------------------------:|:-------------------------:
-![](./sample_frames/frame005000.jpg)  |  ![](./sample_frames/frame001850.jpg)
-![](./sample_frames/frame015000.jpg)  |  ![](./sample_frames/frame005796.jpg)
-![](./sample_frames/frame025000.jpg)  |  ![](./sample_frames/frame010019.jpg)
-![](./sample_frames/frame037500.jpg)  |  ![](./sample_frames/frame015410.jpg)
+![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame005000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame001850.jpg)
+![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame015000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame005796.jpg)
+![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame025000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame010019.jpg)
+![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame037500.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-2/tree/master/sample_frames/frame015410.jpg)
 
 *****************************************************************************
 *****************************************************************************
