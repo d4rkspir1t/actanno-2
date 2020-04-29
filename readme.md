@@ -24,14 +24,14 @@ RICA: Robocentric Indoor Crowd Analysis Dataset, Schmuck V., Celiktutan O., In P
 
 *****************************************************************************
 
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/bbox003646_censored.jpg)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/bbox003646_censored.jpg =100x)
 
 | RGB            |  Wide-angle |
 :-------------------------:|:-------------------------:
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame005000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame001850.jpg)
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame015000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame005796.jpg)
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame025000.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame010019.jpg)
-![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame037500.jpg)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame015410.jpg)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame005000.jpg =100x)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame001850.jpg =100x)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame015000.jpg =100x)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame005796.jpg =100x)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame025000.jpg =100x)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame010019.jpg =100x)
+![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame037500.jpg =100x)  |  ![](https://github.com/d4rkspir1t/actanno-v3/blob/master/sample_frames/frame015410.jpg =100x)
 
 *****************************************************************************
 *****************************************************************************
