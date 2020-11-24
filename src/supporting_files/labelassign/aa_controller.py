@@ -49,9 +49,10 @@ def mkdir_p(path):
 
 class AAController:
 	def __init__(self, t_lib, classnames):
+	# def __init__(self, classnames):
 		self.classnames_obj = classnames
 		global trackingLib
-		trackingLib = t_lib
+		trackingLib = None
 
 		self.old_frame = None
 		self.frames = []
@@ -80,7 +81,7 @@ class AAController:
 		prefix = cfg.MAIN_DIR + cfg.RGB_PREFIX
 		self.filenames = sorted(glob.glob(prefix + "*"))
 		if len(self.filenames) < 1:
-			sys.stderr.write("Did not find any rgb frames! Is the prefix correct? Prefix: ", prefix)
+			sys.stderr.write("Did not find any rgb frames! Is the prefix correct? Prefix: {}".format(prefix))
 			self.usage()
 		for i in range(len(self.filenames)):
 			self.frames.append(aaf.AAFrame())
@@ -114,7 +115,7 @@ class AAController:
 			self.depth_available = False
 
 		self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
-		self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
+		self.aid_filename = '../keybindings/' + cfg.AID_IMG
 		# If the given XML file exists, parse it
 
 		if not os.path.isdir(os.path.dirname(self.output_filename)):
@@ -278,32 +279,32 @@ class AAController:
 			rect_to_propagate = self.frames[self.cur_frame_nr - 1].rects[rect_index]
 
 			# get his new position by tracking
-			if trackingLib is None:
-				# simple copy
-				print("simple copy")
-				self.cur_frame()
-				rect_propagated = copy.deepcopy(rect_to_propagate)
-			else:
-				# JM tracking
-				print("use JM tracking")
-				self.old_frame = self.cur_image
-				self.cur_frame()
-
-				# convert PIL image to OpenCV image
-				cv_old_img = cvCreateImageFromPilImage(self.old_frame)
-				cv_cur_img = cvCreateImageFromPilImage(self.cur_image)
-				# No need to invoke cvRelease...()
-
-				# convert Python types to C types
-				c_inrect = rect_mngr.to_c_aa_rect(rect_to_propagate)
-				c_outrect = rect_mngr.CAARect()
-
-				# call C++ tracking lib
-				trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
-												 ctypes.byref(c_inrect), ctypes.byref(c_outrect))
-
-				# convert C types to Python types
-				rect_propagated = rect_mngr.to_aa_rect(c_outrect)
+			# if trackingLib is None:
+			# simple copy
+			print("simple copy")
+			self.cur_frame()
+			rect_propagated = copy.deepcopy(rect_to_propagate)
+			# else:
+			# 	# JM tracking
+			# 	print("use JM tracking")
+			# 	self.old_frame = self.cur_image
+			# 	self.cur_frame()
+			#
+			# 	# convert PIL image to OpenCV image
+			# 	cv_old_img = cvCreateImageFromPilImage(self.old_frame)
+			# 	cv_cur_img = cvCreateImageFromPilImage(self.cur_image)
+			# 	# No need to invoke cvRelease...()
+			#
+			# 	# convert Python types to C types
+			# 	c_inrect = rect_mngr.to_c_aa_rect(rect_to_propagate)
+			# 	c_outrect = rect_mngr.CAARect()
+			#
+			# 	# call C++ tracking lib
+			# 	trackingLib.track_block_matching(ctypes.byref(cv_old_img), ctypes.byref(cv_cur_img),
+			# 									 ctypes.byref(c_inrect), ctypes.byref(c_outrect))
+			#
+			# 	# convert C types to Python types
+			# 	rect_propagated = rect_mngr.to_aa_rect(c_outrect)
 			# self.frames[self.curFrameNr].rects.append(outrect)
 
 			rect_propagated.object_id = propagate_id

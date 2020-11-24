@@ -123,7 +123,7 @@ class AAController:
         self.output_filename = cfg.MAIN_DIR + cfg.XML_PREFIX
         self.human_tracker_xml = cfg.MAIN_DIR + cfg.HUM_TRA_PREFIX
         if cfg.AID_IMG != 'default':
-            self.aid_filename = cfg.MAIN_DIR + cfg.AID_IMG
+            self.aid_filename = '../keybindings/' + cfg.AID_IMG
         # If the given XML file exists, parse it
 
         if not os.path.isdir(os.path.dirname(self.output_filename)):
@@ -405,9 +405,9 @@ class AAController:
         if frame_info is None:
             self.mysql_mngr_obj.insert_ca_frame_label(fnr, object_id, aclass)
 
-    def del_rect(self, index):
-        # print 'To delete del_rect: ', index
-        self.mysql_mngr_obj.del_ca_frame_single(self.cur_frame_nr, index + 1)
+    def del_rect(self, index, human_id):
+        print('To delete del_rect: ', index, human_id, self.cur_frame_nr)
+        self.mysql_mngr_obj.del_ca_frame_single(self.cur_frame_nr, human_id)
         del self.frames[self.cur_frame_nr].get_rects()[index]
 
     def get_sem_mouse_pos(self, x, y):
@@ -454,6 +454,7 @@ class AAController:
         for frame_id in frame_nos:
             frame_info = self.mysql_mngr_obj.select_ca_frame_info(frame_id)
             mysql_dict[frame_id] = {}
+            print(frame_id, 'Read frame info: ', frame_info)
             for info in frame_info:
                 human_id = info[0]
                 human_label = info[1]
@@ -576,7 +577,7 @@ class AAController:
                     aclass = -1
 
                 try:
-                    self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, aclass)
+                    self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr, aclass)
                 except IndexError:
                     print("*** ERROR ***")
                     print("The XML file contains rectangles in frame numbers which are outside of the video")
@@ -621,7 +622,7 @@ class AAController:
                 bw = int(get_att(bb, "width"))
                 bh = int(get_att(bb, "height"))
                 try:
-                    self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr - 1, -1)
+                    self.add_rect(bx, by, bx + bw - 1, by + bh - 1, anr, bfnr, -1)
                 except IndexError:
                     print("*** ERROR ***")
                     print("The XML file contains rectangles in frame numbers which are outside of the video")

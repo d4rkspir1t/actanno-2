@@ -1,10 +1,12 @@
 DATASET_NAME: 'SAIR.ELP'
 OWNER: 'SAIR lab - KCL'
 VOC_DIR: 'voc/'
-XML_PREFIX: 'aa2.xml'
-RGB_PREFIX: '/head-rgb/bbox'
+XML_PREFIX: 'seg1_group.xml'
+RGB_PREFIX: 'frame'
 D_PREFIX: 'default'
 AID_IMG: 'f-formations.png'
 CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "rectangular"]
-BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/kcltestimages/bbox_rgb'
-FNAME_PREFIX: 'bbox'
+BBOX_PREFIX: '/home/viktor/Desktop/actanno-v3/group_level_outputs'
+FNAME_PREFIX: 'frame'
+
+# python actanno-v3-labelassign.py ./supporting_files/labelassign/ /home/viktor/Documents/seg1/

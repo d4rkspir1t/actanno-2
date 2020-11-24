@@ -36,23 +36,23 @@ def main():
 
     trackingLib = None
     # load C++ JM tracking library
-    if os.name == 'posix':
-        # ---- Mac Os
-        if platform.system() == 'Darwin':
-            trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dylib"))
-
-        # ---- Linux
-        else:
-            trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.so"))
-    # ---- Windows
-    elif os.name == 'nt':
-        trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
-
-    if trackingLib is not None:
-        # print "JM tracking library loaded."
-        trackingLib.init_lib()
-    else:
-        print("Failed to load JM tracking library.")
+    # if os.name == 'posix':
+    #     # ---- Mac Os
+    #     if platform.system() == 'Darwin':
+    #         trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dylib"))
+    #
+    #     # ---- Linux
+    #     else:
+    #         trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.so"))
+    # # ---- Windows
+    # elif os.name == 'nt':
+    #     trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
+    #
+    # if trackingLib is not None:
+    #     # print "JM tracking library loaded."
+    #     trackingLib.init_lib()
+    # else:
+    #     print("Failed to load JM tracking library.")
     print(trackingLib)
 
     root = Tk()

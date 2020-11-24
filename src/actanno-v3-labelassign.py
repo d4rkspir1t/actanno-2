@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
 import os
@@ -18,7 +19,6 @@ def onexit():
 
 def main():
 	cur_path = sys.path[0]
-
 	config_path = sys.argv[1]
 	cfg_file = os.path.join(config_path, 'config.yml')
 	# print "Loading config from >%s<" % cfg_file
@@ -35,23 +35,23 @@ def main():
 
 	trackingLib = None
 	# load C++ JM tracking library
-	if os.name == 'posix':
-		# ---- Mac Os
-		if platform.system() == 'Darwin':
-			trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dylib"))
-
-		# ---- Linux
-		else:
-			trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.so"))
-	# ---- Windows
-	elif os.name == 'nt':
-		trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
-
-	if trackingLib is not None:
-		# print "JM tracking library loaded."
-		trackingLib.init_lib()
-	else:
-		print("Failed to load JM tracking library.")
+	# if os.name == 'posix':
+	# 	# ---- Mac Os
+	# 	if platform.system() == 'Darwin':
+	# 		trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dylib"))
+	#
+	# 	# ---- Linux
+	# 	else:
+	# 		trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.so"))
+	# # ---- Windows
+	# elif os.name == 'nt':
+	# 	trackingLib = ctypes.CDLL(os.path.join(cur_path, "boxtracking", "libboxtracking.dll"))
+	#
+	# if trackingLib is not None:
+	# 	# print "JM tracking library loaded."
+	# 	trackingLib.init_lib()
+	# else:
+	# 	print("Failed to load JM tracking library.")
 	# print trackingLib
 
 	root = Tk()

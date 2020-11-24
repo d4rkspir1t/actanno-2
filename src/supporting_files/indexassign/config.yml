@@ -3,9 +3,10 @@ OWNER: 'SAIR lab - KCL'
 VOC_DIR: 'voc/'
 XML_PREFIX: '/seg1_human.xml'
 #HUM_TRA_PREFIX: 'default'
-RGB_PREFIX: '/bbox'
-AID_IMG: '/keybind_humanno.png'
+RGB_PREFIX: '/frame'
+AID_IMG: 'keybind_humanno.png'
 CLASSES: ["N/A"]
-BBOX_PREFIX: '/home/viktor/Desktop/actanno/actanno-2/human-notation/seg1_final'
-FNAME_PREFIX: 'bbox'
+BBOX_PREFIX: '/home/viktor/Desktop/actanno-v3/person_level_outputs'
+FNAME_PREFIX: 'frame'
 
+# python actanno-v3-indexassign.py ./supporting_files/indexassign/ /home/viktor/Documents/seg1-groups/

@@ -30,7 +30,7 @@ trackingLib = None
 class FrameManager(Frame):
 	def __init__(self, parent, cur_path, t_lib, classnames):
 		global trackingLib
-		trackingLib = t_lib
+		# trackingLib = t_lib
 		self.classnames_obj = classnames
 		Frame.__init__(self, parent)
 		self.parent = parent
