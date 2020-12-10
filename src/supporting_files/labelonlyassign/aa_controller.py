@@ -56,7 +56,7 @@ class AAController:
 
 		self.old_frame = None
 		self.frames = []
-		self.class_assignations = []
+		self.class_assignations = {}
 
 		# The nr. of the currently visible frame
 		self.cur_frame_nr = 0
@@ -146,7 +146,7 @@ class AAController:
 
 		# Check for unassigned ClassAssignations (no known object class)
 		msg2 = ''
-		for (i, x) in enumerate(self.class_assignations):
+		for i, x in self.class_assignations.items():
 			if x is None:
 				continue
 			if x < 0:
@@ -254,15 +254,6 @@ class AAController:
 	def get_sem_mouse_pos(self, x, y):
 		return self.frames[self.cur_frame_nr].get_sem_mouse_pos(x, y)
 
-	# Tell the system the given object_id is used. If the array holding the classes
-	# for the different ids is not large enough, grow it and insert -1 as class
-	def use_object_id(self, new_id):
-		neededcap = new_id - len(self.class_assignations)
-		if neededcap > 0:
-			for i in range(neededcap):
-				self.class_assignations.append(-1)
-		# print "new run id array", self.class_assignations
-
 	def export_xml(self):
 		self.export_xml_filename(self.output_filename)
 
@@ -290,10 +281,10 @@ class AAController:
 			found_rects = False
 			for (i, f) in enumerate(self.frames):
 				for (j, r) in enumerate(f.get_rects()):
-					if r.object_id == cur_object_id + 1:
+					if r.object_id == cur_object_id:
 						if not found_rects:
 							found_rects = True
-							fd.write("	<object nr=\"" + str(cur_object_id + 1) + "\" class=\"" + str(
+							fd.write("	<object nr=\"" + str(cur_object_id) + "\" class=\"" + str(
 								self.class_assignations[cur_object_id]) + "\">\n")
 						framenr = int(self.filenames[i].split(cfg.FNAME_PREFIX)[-1].split('.')[0])
 						s = "	  <bbox x=\"" + str(int(r.x1)) + "\" y=\"" + str(int(r.y1))
@@ -330,9 +321,7 @@ class AAController:
 			# Add the classnr to the object_id array. Grow if necessary
 			anr = int(get_att(a, "nr"))
 			aclass = int(get_att(a, "class"))
-			if len(self.class_assignations) < anr:
-				self.class_assignations += [None] * (anr - len(self.class_assignations))
-			self.class_assignations[anr - 1] = aclass
+			self.class_assignations[anr] = aclass
 
 			# Get all the bounding boxes for this object
 			bbs = a.findall("bbox")

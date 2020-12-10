@@ -62,7 +62,7 @@ class FrameManager(Frame):
 		self.canvas.create_image(0, 0, anchor=NW, image=self.cur_frame)
 		self.aid_canvas.create_image(0,0, anchor=NW, image=self.aid_frame)
 
-		self.object_id_box = Listbox(self.parent)
+		self.object_id_box = Listbox(self.parent, width=40)
 		# self.id_text_var = StringVar()
 		# self.id_setter = Button(self.parent, textvariable=self.id_text_var, state=DISABLED)
 		self.save_button = Button(self.parent, text="SAVE")
@@ -72,13 +72,10 @@ class FrameManager(Frame):
 
 		# position
 		self.canvas.grid(row=0, column=0, rowspan=6)
-		self.object_id_box.grid(row=0, column=1, sticky=N + S)
-		# self.fn_entry.grid(row=1, column=1)
-		# self.id_setter.grid(row=2, column=1)
-		# self.switch_button.grid(row=2, column=1)
+		self.object_id_box.grid(row=0, column=1, rowspan=3, sticky=N + S)
 		self.save_button.grid(row=3, column=1)
-		self.quit_button.grid(row=5, column=1)
-		self.xscale.grid(row=6, sticky=W + E)
+		self.quit_button.grid(row=4, column=1)
+		self.xscale.grid(row=6, sticky=W + E, columnspan=3)
 		self.aid_canvas.grid(row=0, column=2, rowspan=6)
 
 		# bindings
@@ -88,10 +85,6 @@ class FrameManager(Frame):
 		self.canvas.bind("<Next>", self.next_frame_far)
 		self.canvas.bind("<Prior>", self.prev_frame_far)  # the space key
 		self.canvas.bind("<Motion>", self.mouse_move)
-		# self.canvas.bind("<Button-1>", self.left_mouse_down)
-		# self.canvas.bind("<ButtonRelease-1>", self.left_mouse_up)
-		# self.canvas.bind("<Button-3>", self.right_mouse_down)
-		# self.canvas.bind("<ButtonRelease-3>", self.right_mouse_up)
 		self.canvas.bind("q", self.quit)
 		self.canvas.bind("s", self.save_xml)
 		self.object_id_box.bind("<Key-space>", self.next_frame)  # the space key
@@ -104,7 +97,7 @@ class FrameManager(Frame):
 		self.state = ""
 		self.mousex = 1
 		self.mousey = 1
-		self.object_id_proposed_for_new_rect = len(self.ct.class_assignations) + 1
+		self.object_id_proposed_for_new_rect = list(self.ct.class_assignations.keys())[-1] + 1
 		# self.id_text_var.set("Next id: %d" % (int(self.object_id_proposed_for_new_rect)))
 		self.display_anno()
 		self.display_class_assignations()
@@ -115,9 +108,6 @@ class FrameManager(Frame):
 
 	def get_canvas_box(self):
 		x = self.canvas.winfo_rootx() + self.canvas.winfo_x()
-		# print 'win ', self.canvas.winfo_x(), ' ', self.canvas.winfo_rootx()
-		# print 'win ', self.canvas.winfo_y(), ' ', self.canvas.winfo_rooty()
-		# y = self.canvas.winfo_rooty() + self.canvas.winfo_y()
 		y = self.canvas.winfo_rooty()
 		x1 = x + self.canvas.winfo_width()
 		y1 = y + self.canvas.winfo_height()
@@ -127,8 +117,8 @@ class FrameManager(Frame):
 
 	def check_validity(self):
 		msg = self.ct.check_validity()
-		if len(self.fn_entry.get()) < 1:
-			msg = msg + "The video name is empty.\n"
+		# if len(self.fn_entry.get()) < 1:
+		# 	msg = msg + "The video name is empty.\n"
 		if len(msg) > 0:
 			messagebox.showinfo(TITLE, "There are errors in the annotation:\n\n" + msg +
 								  "\nThe file has been saved. Please address the problem(s) and save again.")
@@ -384,30 +374,14 @@ class FrameManager(Frame):
 		draw_frame = self.img.copy()
 		draw = ImageDraw.Draw(draw_frame)
 
-		# Draw all rectangles
-		for (i, r) in enumerate(self.ct.get_rects()):
-			if i == sempos.index:
-				curcol = "green"
-			else:
-				curcol = "green"
-			draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
-			# draw.rectangle([r.x1 + 1, r.y1 + 1, r.x2 - 1, r.y2 - 1], outline=curcol)
-			draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)
-
-			# Draw the icons
-			# if i == sempos.index:
-			# 	if sempos.sem_pos == "ul":
-			# 		self.draw_anchor_point(draw, r.x1, r.y1)
-			# 	if sempos.sem_pos == "ur":
-			# 		self.draw_anchor_point(draw, r.x2, r.y1)
-			# 	if sempos.sem_pos == "ll":
-			# 		self.draw_anchor_point(draw, r.x1, r.y2)
-			# 	if sempos.sem_pos == "lr":
-			# 		self.draw_anchor_point(draw, r.x2, r.y2)
-			# 	if sempos.sem_pos == "c":
-			# 		cx = 0.5 * (r.x1 + r.x2)
-			# 		cy = 0.5 * (r.y1 + r.y2)
-			# 		self.draw_anchor_point(draw, cx, cy)
+		# # Draw all rectangles
+		# for (i, r) in enumerate(self.ct.get_rects()):
+		# 	if i == sempos.index:
+		# 		curcol = "green"
+		# 	else:
+		# 		curcol = "green"
+		# 	draw.rectangle([r.x1, r.y1, r.x2, r.y2], outline=curcol)
+		# 	draw.text([r.x1 + 3, r.y1 + 2], str(r.object_id), font=self.img_font, fill=curcol)
 
 		del draw
 		self.draw_photo = ImageTk.PhotoImage(draw_frame)
@@ -416,13 +390,14 @@ class FrameManager(Frame):
 	def display_class_assignations(self):
 		self.object_id_box.delete(0, END)
 		x = self.ct.class_assignations
-		for i in range(len(x)):
-			if x[i] is None:
+		# print(self.ct.class_assignations)
+		for key, val in x.items():
+			if val is None:
 				continue
-			if x[i] < 0:
-				self.object_id_box.insert(END, str(i + 1) + " has no assigned class ")
+			if val < 0:
+				self.object_id_box.insert(END, str(key) + " has no assigned class ")
 			else:
-				self.object_id_box.insert(END, str(i + 1) + " has class " + str(x[i]) + " [" + self.classnames_obj.name_list[x[i]] + "]")
+				self.object_id_box.insert(END, str(key) + " has class " + str(val) + " [" + self.classnames_obj.name_list[val] + "]")
 
 	# a listbox item has been clicked: choose the object class for
 	# a given object
@@ -440,8 +415,11 @@ class FrameManager(Frame):
 			class_id += 1
 
 	def chose_class_nr(self, class_nr):
-		object_id = int(self.clicked_object_id[0])
-		self.ct.class_assignations[object_id] = class_nr
+		object_text = self.object_id_box.get(self.clicked_object_id)
+		group_id = object_text.split(' ')[0]
+		print(group_id, class_nr)
+		self.ct.class_assignations[int(group_id)] = class_nr
+
 		self.class_dlg.destroy()
 		self.display_class_assignations()
 		# Put the focus on the canvas, else the listbox gets all events

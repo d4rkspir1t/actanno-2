@@ -4,9 +4,9 @@ VOC_DIR: 'voc/'
 XML_PREFIX: 'seg1_group_fdz.xml'
 RGB_PREFIX: 'frame'
 D_PREFIX: 'default'
-AID_IMG: 'f-formations.png'
-CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "rectangular", "circular"]
+AID_IMG: 'new-f-formation-keybind.png'
+CLASSES: ["N/A", "L-arrangement", "face-to-face", "side-by-side", "semi-circular", "triangular", "rectangular", "circular"]
 BBOX_PREFIX: '/home/viktor/Desktop/actanno-v3/group_level_outputs'
 FNAME_PREFIX: 'frame'
 
-# python actanno-v3-labelling_only.py ./supporting_files/labelonlyassign/ /home/viktor/Documents/seg1/
+# python actanno-v3-labelling_only.py ./supporting_files/labelonlyassign/ /home/viktor/Documents/seg1-grouplabel/
