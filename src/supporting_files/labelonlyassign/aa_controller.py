@@ -1,7 +1,6 @@
 import sys
 import glob
 import numpy as np
-import copy
 import os
 import matplotlib.image as mpimg
 import xml.etree.ElementTree as xml
