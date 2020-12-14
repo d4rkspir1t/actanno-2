@@ -54,6 +54,12 @@ The run commands are (when inside the `src` folder or an IDE):
 ... where the first input points to the folder of the configuration file(s). And the second parameter should 
 point to the input images. This folder will also be the location of the resulting XML file.
 
+In addition, it is now possible to load previously created bounding box images and bounding box information purely
+for relabelling purposes - This is useful when multiple annotators are required for increased validity, but the
+bounding box placement should not be changed. The run command (inside `src`) is:
+
+`python actanno-v3-labelling_only.py ./supporting_files/labelonlyassign/ /path/to/boundingbox/images/and/xml/`
+
 ### MySql setup ###
 1. Install MySql and the python mysql connector.
 1. Set up the MySql environment e.g. by:
@@ -62,6 +68,15 @@ point to the input images. This folder will also be the location of the resultin
 
 *****************************************************************************
 ## CHANGELOG ##
+
+14.12.20 vs:
+- adjustments to work on Ubuntu 18.04
+- excluded JMTracking due to incompatibility
+- indexassign -> fixed errors with merged boxes between frames, duplicate output save in same frame into the xml file, 
+  moving bbox no longer produces duplicates
+- deletion of not highest index bbox does not ruin reliability of box saving and label tracking
+- labelonlyassign -> label assignment based on dicts, fixed and simlified xml saving, adjusted layout, 
+  reduced functionality e.g. no bounding box manipulation
 
 29.04.20 vs
 - 2 versions of actanno v3 created
