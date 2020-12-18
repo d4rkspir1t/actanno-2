@@ -9,7 +9,7 @@ from PIL import Image
 
 from tkinter import messagebox
 
-from minimal_ctypes_opencv import *
+# from minimal_ctypes_opencv import *
 from config import cfg
 import supporting_files.rectangle_manager as rect_mngr
 import supporting_files.aa_frame as aaf

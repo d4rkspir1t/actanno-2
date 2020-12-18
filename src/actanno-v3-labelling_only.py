@@ -5,7 +5,8 @@ import sys
 
 from tkinter import Tk
 
-from minimal_ctypes_opencv import *
+# from minimal_ctypes_opencv import *
+import os
 from config import cfg
 from config import cfg_from_file
 import supporting_files.labelonlyassign.frame_manager as frame_mngr

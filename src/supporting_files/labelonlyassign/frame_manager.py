@@ -32,7 +32,8 @@ class FrameManager(Frame):
 		self.cur_path = cur_path
 		self.ct = aac.AAController(self.classnames_obj)
 		font_path = os.path.dirname(os.path.realpath(__file__))
-		self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 30)
+		self.img_font = ImageFont.truetype(os.path.join(font_path, "arial.ttf"), 30)
+		# self.img_font = ImageFont.truetype(os.path.join(font_path, "FreeSans.ttf"), 30)
 		self.init_ui()
 		self.event_counter = 0
 

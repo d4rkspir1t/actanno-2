@@ -1,4 +1,4 @@
-from minimal_ctypes_opencv import *
+# from minimal_ctypes_opencv import *
 
 
 class AARect:
@@ -24,9 +24,9 @@ class AARect:
 
 
 # C type matching Python type
-class CAARect(ctypes.Structure):
-    _fields_ = [("x1", ctypes.c_int), ("y1", ctypes.c_int), ("x2", ctypes.c_int), ("y2", ctypes.c_int),
-                ("objectId", ctypes.c_int)]
+# class CAARect(ctypes.Structure):
+#     _fields_ = [("x1", ctypes.c_int), ("y1", ctypes.c_int), ("x2", ctypes.c_int), ("y2", ctypes.c_int),
+#                 ("objectId", ctypes.c_int)]
 
 
 # convert AARect to c_AARect
