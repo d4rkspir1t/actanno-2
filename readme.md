@@ -40,7 +40,7 @@ Schmuck V., Celiktutan O., In Proceedings of UKRAS2020, 2020
 1. Install OpenCV
 1. Install TKinter
 1. Set up an environment:
-> 1. Set up a Python 3.7 base environment with `conda create --name aao python=3.6`
+> 1. Set up a Python 3.7 base environment with `conda create --name aao python=3.7`
 > 1. `pip install pyscreenshot pillow matplotlib easydict PyYAML numpy==1.19.3` 
 
 ### Configuration ###
